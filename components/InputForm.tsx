@@ -163,9 +163,15 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           onChange={(v) => set('directorSalary', v)}
           hint="自分への給与として設定する金額"
         />
-        <div className="bg-blue-50 rounded-lg p-3 text-xs text-blue-700">
-          💡 役員報酬は会社の経費になります。給与所得控除も使えるため個人事業主より節税効果があります。
-          残りの利益は法人に留保されます。
+        <div className="bg-blue-50 rounded-lg p-3 text-xs text-blue-700 space-y-2">
+          <p>💡 役員報酬は会社の経費になります。給与所得控除も使えるため個人事業主より節税効果があります。残りの利益は法人に留保されます。</p>
+          <hr className="border-blue-200" />
+          <p className="font-semibold">📌 社会保険料の目安</p>
+          <ul className="space-y-1 pl-1">
+            <li>・<span className="font-medium">月額45万円</span>が「最適ライン」とよく言われます。社保が最低等級になり給与所得控除も活用できるバランスの良い金額です</li>
+            <li>・最低等級（標準報酬月額 健保58,000円 / 厚年88,000円）での社保合計は<span className="font-medium">約17,000円/月</span>（会社＋本人）</li>
+            <li>・役員報酬を<span className="font-medium">0円</span>にすると社会保険加入自体が不要になりますが、公的年金・健保の保障もなくなります</li>
+          </ul>
         </div>
       </Section>
 
