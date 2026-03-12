@@ -32,7 +32,7 @@ function MoneyInput({
           value={value === 0 ? '' : value}
           onChange={(e) => onChange(Number(e.target.value) || 0)}
           placeholder="0"
-          className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
     </div>
@@ -72,7 +72,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           <select
             value={data.blueFormDeduction}
             onChange={(e) => set('blueFormDeduction', Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value={650000}>65万円（電子申告・複式簿記）</option>
             <option value={550000}>55万円（複式簿記）</option>
@@ -91,7 +91,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           <select
             value={data.industryTaxRate}
             onChange={(e) => set('industryTaxRate', Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value={0.05}>5%（一般的な事業）</option>
             <option value={0.04}>4%（畜産業・水産業など）</option>
@@ -103,15 +103,15 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
 
       {/* 家族・控除 */}
       <Section title="👨‍👩‍👧 家族構成・所得控除">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
             <p className="text-sm font-medium text-gray-700">配偶者あり</p>
             <p className="text-xs text-gray-400">配偶者の所得が48万円以下</p>
           </div>
           <button
             type="button"
             onClick={() => set('hasSpouse', !data.hasSpouse)}
-            className={`relative w-12 h-6 rounded-full transition-colors ${
+            className={`relative shrink-0 w-12 h-6 rounded-full transition-colors ${
               data.hasSpouse ? 'bg-blue-500' : 'bg-gray-300'
             }`}
           >
@@ -132,7 +132,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
             max={10}
             value={data.dependents}
             onChange={(e) => set('dependents', Number(e.target.value) || 0)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <MoneyInput
@@ -150,7 +150,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
             max={80}
             value={data.age}
             onChange={(e) => set('age', Number(e.target.value) || 40)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </Section>
