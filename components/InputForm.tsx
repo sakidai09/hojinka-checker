@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef, useState } from 'react'
 import { InputData } from '@/lib/types'
 
 interface Props {
@@ -52,20 +53,103 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
   const set = <K extends keyof InputData>(key: K, value: InputData[K]) =>
     onChange({ ...data, [key]: value })
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [ocrStatus, setOcrStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const [ocrError, setOcrError] = useState('')
+  const [dragging, setDragging] = useState(false)
+
+  const handleFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setOcrError('画像ファイル（JPG / PNG）をアップロードしてください')
+      setOcrStatus('error')
+      return
+    }
+    setOcrStatus('loading')
+    setOcrError('')
+    const form = new FormData()
+    form.append('file', file)
+    try {
+      const res = await fetch('/api/ocr', { method: 'POST', body: form })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || '読み取り失敗')
+      const d = json.data
+      onChange({
+        ...data,
+        ...(d.revenue != null && { revenue: d.revenue }),
+        ...(d.expenses != null && { expenses: d.expenses }),
+        ...(d.blueFormDeduction != null && { blueFormDeduction: d.blueFormDeduction }),
+        ...(d.familyWorkerSalary != null && { familyWorkerSalary: d.familyWorkerSalary }),
+      })
+      setOcrStatus('done')
+    } catch (e: unknown) {
+      setOcrError(e instanceof Error ? e.message : '読み取りに失敗しました')
+      setOcrStatus('error')
+    }
+  }
+
   return (
     <div className="space-y-4">
+      {/* 確定申告書アップロード */}
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setDragging(false)
+          const file = e.dataTransfer.files[0]
+          if (file) handleFile(file)
+        }}
+        onClick={() => fileInputRef.current?.click()}
+        className={`cursor-pointer rounded-xl border-2 border-dashed p-5 text-center transition-colors ${
+          dragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300 bg-white hover:border-blue-300 hover:bg-gray-50'
+        }`}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
+        />
+        {ocrStatus === 'loading' ? (
+          <div className="flex flex-col items-center gap-2 text-blue-600">
+            <svg className="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+            </svg>
+            <p className="text-sm font-medium">確定申告書を読み取り中…</p>
+          </div>
+        ) : ocrStatus === 'done' ? (
+          <div className="flex flex-col items-center gap-1 text-green-600">
+            <span className="text-2xl">✅</span>
+            <p className="text-sm font-medium">読み取り完了！内容を確認してください</p>
+            <p className="text-xs text-gray-400">別の画像を読み込む場合はここをタップ</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2 text-gray-500">
+            <span className="text-3xl">📄</span>
+            <p className="text-sm font-medium text-gray-700">確定申告書の画像をアップロード</p>
+            <p className="text-xs">タップして選択 またはドラッグ＆ドロップ</p>
+            <p className="text-xs text-gray-400">JPG / PNG 対応 ・ AIが自動で数値を読み取ります</p>
+          </div>
+        )}
+        {ocrStatus === 'error' && (
+          <p className="mt-2 text-xs text-red-500">{ocrError}</p>
+        )}
+      </div>
       {/* 売上・経費 */}
       <Section title="📊 売上・経費">
         <MoneyInput
           label="年間売上高"
           value={data.revenue}
           onChange={(v) => set('revenue', v)}
+          hint="確定申告書B 第一表①欄（事業・営業等）／収支内訳書・青色申告決算書の「売上（収入）金額」"
         />
         <MoneyInput
           label="年間経費合計"
           value={data.expenses}
           onChange={(v) => set('expenses', v)}
-          hint="専従者給与は除く"
+          hint="収支内訳書・青色申告決算書の「経費合計」欄（専従者給与は除く）"
         />
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">青色申告特別控除</label>
@@ -168,7 +252,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           <hr className="border-blue-200" />
           <p className="font-semibold">📌 社会保険料の目安</p>
           <ul className="space-y-1 pl-1">
-            <li>・<span className="font-medium">月額45万円</span>が「最適ライン」とよく言われます。社保が最低等級になり給与所得控除も活用できるバランスの良い金額です</li>
+            <li>・<span className="font-medium">月額45,000円</span>が「最適ライン」とよく言われます。社保が最低等級になり給与所得控除も活用できるバランスの良い金額です</li>
             <li>・最低等級（標準報酬月額 健保58,000円 / 厚年88,000円）での社保合計は<span className="font-medium">約17,000円/月</span>（会社＋本人）</li>
             <li>・役員報酬を<span className="font-medium">0円</span>にすると社会保険加入自体が不要になりますが、公的年金・健保の保障もなくなります</li>
           </ul>
