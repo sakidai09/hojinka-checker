@@ -125,18 +125,24 @@ export default function ResultDisplay({
                 </li>
               ))}
             </ul>
-            <div className="border-t border-blue-200 pt-3 text-xs text-blue-700">
-              <span className="font-semibold">法人化が有利になる目安：</span>
-              {result.tippingPointBusinessIncome != null ? (
-                <>
-                  現在の条件では、事業所得が約{' '}
-                  <span className="font-semibold">
-                    {(result.tippingPointBusinessIncome / 10_000).toLocaleString()}万円
-                  </span>
-                  {' '}を超えると法人化が有利になる可能性があります。売上・利益が増えたタイミングで再シミュレーションしてみましょう。
-                </>
-              ) : (
-                '現在の役員報酬設定では、売上が大幅に増えても法人化のメリットが出にくい可能性があります。役員報酬額を見直してから再シミュレーションしてみましょう。'
+            <div className="border-t border-blue-200 pt-3 text-xs text-blue-700 space-y-1">
+              <p className="font-semibold">法人化が有利になる目安</p>
+              {result.tippingPointBusinessIncome != null ? (() => {
+                const currentBI = result.individual.businessIncome
+                const targetBI  = result.tippingPointBusinessIncome!
+                const gap       = Math.max(0, targetBI - currentBI)
+                return (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span>現在の事業所得：<span className="font-semibold">{(currentBI / 10_000).toLocaleString()}万円</span></span>
+                    <span className="text-blue-400">→</span>
+                    <span>
+                      目標：<span className="font-semibold">約{(targetBI / 10_000).toLocaleString()}万円</span>
+                      {gap > 0 && <span className="ml-1 text-blue-500">（あと約{(gap / 10_000).toLocaleString()}万円）</span>}
+                    </span>
+                  </div>
+                )
+              })() : (
+                <p>現在の役員報酬設定では、売上が大幅に増えても法人化のメリットが出にくい可能性があります。役員報酬額を見直してから再シミュレーションしてみましょう。</p>
               )}
             </div>
           </div>
