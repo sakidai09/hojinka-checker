@@ -102,13 +102,9 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
         <p className="text-xs text-gray-500">
           以下いずれかの書類を撮影・スキャンした画像をアップロードすると、AIが数値を自動で読み取ります。
         </p>
-        <div className="flex gap-2 flex-wrap">
-          {['確定申告書B 第一表', '収支内訳書', '青色申告決算書'].map((label) => (
-            <span key={label} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
-              ✓ {label}
-            </span>
-          ))}
-        </div>
+        <p className="text-xs text-gray-500">
+          対応書類：確定申告書B 第一表 ／ 収支内訳書 ／ 青色申告決算書
+        </p>
 
         {/* アップロードエリア */}
         <div

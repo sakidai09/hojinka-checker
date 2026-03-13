@@ -21,8 +21,8 @@ function Row({
   return (
     <tr className={highlight ? 'font-semibold bg-gray-50' : ''}>
       <td className="py-2 pr-4 text-sm text-gray-600 whitespace-nowrap">{label}</td>
-      <td className="py-2 px-3 text-sm text-right">{yen(individual)}</td>
-      <td className="py-2 px-3 text-sm text-right">{yen(corporation)}</td>
+      <td className={`py-2 px-3 text-sm text-right ${highlight ? 'text-gray-900' : 'text-gray-800'}`}>{yen(individual)}</td>
+      <td className={`py-2 px-3 text-sm text-right ${highlight ? 'text-gray-900' : 'text-gray-800'}`}>{yen(corporation)}</td>
     </tr>
   )
 }
@@ -172,7 +172,7 @@ export default function ResultDisplay({
       </div>
 
       {/* 内訳メモ */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-2">
+      <div className="bg-white rounded-xl border border-gray-200 p-5">
         <h3 className="font-semibold text-gray-800 mb-2">計算の前提・注意点</h3>
         <ul className="text-xs text-gray-500 space-y-1 list-disc list-inside">
           <li>社会保険料は協会けんぽ東京 2024年度の料率で試算（地域により異なります）</li>
