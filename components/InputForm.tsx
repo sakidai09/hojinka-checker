@@ -193,6 +193,10 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
         ...(d.expenses != null && { expenses: d.expenses }),
         ...(d.blueFormDeduction != null && { blueFormDeduction: d.blueFormDeduction }),
         ...(d.familyWorkerSalary != null && { familyWorkerSalary: d.familyWorkerSalary }),
+        ...(d.medicalExpenses != null && { medicalExpenses: d.medicalExpenses }),
+        ...(d.lifeInsuranceDeduction != null && { lifeInsuranceDeduction: Math.min(d.lifeInsuranceDeduction, 120_000) }),
+        ...(d.earthquakeInsurance != null && { earthquakeInsurance: Math.min(d.earthquakeInsurance, 50_000) }),
+        ...(d.mortgageDeduction != null && { mortgageDeduction: d.mortgageDeduction }),
       })
       setOcrStatus('done')
     } catch (e: unknown) {
