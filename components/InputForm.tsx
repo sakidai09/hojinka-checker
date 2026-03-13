@@ -20,6 +20,18 @@ function MoneyInput({
   onChange: (v: number) => void
   hint?: string
 }) {
+  const [focused, setFocused] = useState(false)
+
+  // フォーカス中は生の数字、離脱時は3桁カンマ付き
+  const displayValue = focused
+    ? (value === 0 ? '' : String(value))
+    : (value === 0 ? '' : value.toLocaleString())
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^\d]/g, '')
+    onChange(raw === '' ? 0 : parseInt(raw, 10))
+  }
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
@@ -27,11 +39,12 @@ function MoneyInput({
       <div className="relative">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">¥</span>
         <input
-          type="number"
-          min={0}
-          step={10000}
-          value={value === 0 ? '' : value}
-          onChange={(e) => onChange(Number(e.target.value) || 0)}
+          type="text"
+          inputMode="numeric"
+          value={displayValue}
+          onChange={handleChange}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           placeholder="0"
           className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />

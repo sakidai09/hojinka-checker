@@ -16,7 +16,7 @@ const DEFAULT_INPUT: InputData = {
   dependents: 0,
   ideco: 0,
   age: 40,
-  directorSalary: 6_000_000,
+  directorSalary: 540_000,
   industryTaxRate: 0.05,
 }
 
