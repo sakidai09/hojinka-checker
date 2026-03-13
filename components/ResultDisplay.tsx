@@ -1,6 +1,6 @@
 'use client'
 
-import { ComparisonResult } from '@/lib/types'
+import { ComparisonResult, InputData } from '@/lib/types'
 
 function yen(n: number) {
   if (!isFinite(n)) return '−'
@@ -29,9 +29,11 @@ function Row({
 
 export default function ResultDisplay({
   result,
+  input,
   onReset,
 }: {
   result: ComparisonResult
+  input: InputData
   onReset: () => void
 }) {
   const { individual, corporation, savings, verdict, breakEvenYears } = result
@@ -57,11 +59,11 @@ export default function ResultDisplay({
     },
   }[verdict]
 
-  const indTotal  = individual.total
+  const indTotal = individual.total
   const corpTotal = corporation.totalBurden
 
-  const maxVal    = Math.max(indTotal, corpTotal)
-  const indWidth  = Math.round((indTotal / maxVal) * 100)
+  const maxVal = Math.max(indTotal, corpTotal)
+  const indWidth = Math.round((indTotal / maxVal) * 100)
   const corpWidth = Math.round((corpTotal / maxVal) * 100)
 
   return (
@@ -76,6 +78,60 @@ export default function ResultDisplay({
           </div>
         </div>
       </div>
+
+      {/* 今できる節税対策（not_yet のみ） */}
+      {verdict === 'not_yet' && (() => {
+        const tips: { icon: string; title: string; desc: string }[] = []
+
+        if (input.blueFormDeduction < 650_000) {
+          tips.push({
+            icon: '📒',
+            title: '青色申告65万円控除を活用する',
+            desc: '電子申告（e-Tax）＋複式簿記で最大65万円の特別控除が受けられます。現在の設定より節税額が増える可能性があります。',
+          })
+        }
+        if (input.ideco === 0) {
+          tips.push({
+            icon: '💰',
+            title: 'iDeCo・小規模企業共済を活用する',
+            desc: '個人事業主はiDeCo（最大年816,000円）＋小規模企業共済（最大年840,000円）を全額所得控除できます。合わせると最大年間約50万円超の節税効果も。',
+          })
+        } else {
+          tips.push({
+            icon: '🏦',
+            title: '小規模企業共済を活用する',
+            desc: '掛金最大月7万円（年840,000円）が全額所得控除。廃業・退職時には退職金としても受け取れます。',
+          })
+        }
+        if (input.familyWorkerSalary === 0 && input.hasSpouse) {
+          tips.push({
+            icon: '👥',
+            title: '配偶者への専従者給与を活用する',
+            desc: '青色申告の専従者給与を設定すると、給与全額が経費になります（配偶者控除との併用は不可）。配偶者が実際に事業に従事している場合は検討を。',
+          })
+        }
+
+        return (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
+            <p className="font-semibold text-sm text-blue-900">💡 今すぐできる節税対策</p>
+            <ul className="space-y-3">
+              {tips.map((tip, i) => (
+                <li key={i} className="flex gap-2 text-sm">
+                  <span className="text-lg leading-tight">{tip.icon}</span>
+                  <div>
+                    <p className="font-medium text-blue-900">{tip.title}</p>
+                    <p className="text-xs text-blue-700 mt-0.5">{tip.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="border-t border-blue-200 pt-3 text-xs text-blue-700">
+              <span className="font-semibold">法人化が有利になる目安：</span>
+              事業所得が概ね <span className="font-semibold">600〜800万円超</span> になると法人化による節税メリットが出やすくなります。売上・利益が増えたタイミングで再シミュレーションしてみましょう。
+            </div>
+          </div>
+        )
+      })()}
 
       {/* 法人化後の追加コスト（incorporate / consider のみ） */}
       {(verdict === 'incorporate' || verdict === 'consider') && (
@@ -217,7 +273,7 @@ export default function ResultDisplay({
       <div className="bg-white rounded-xl border border-gray-200 p-5">
         <h3 className="font-semibold text-gray-800 mb-2">計算の前提・注意点</h3>
         <ul className="text-xs text-gray-500 space-y-1 list-disc list-inside">
-          <li>社会保険料は協会けんぽ東京 2024年度の料率で試算（地域により異なります）</li>
+          <li>社会保険料は協会けんぽ東京（2024年度）の料率で試算（地域により異なります）</li>
           <li>国民健康保険料は全国平均ベースの簡易計算です（自治体により大きく異なります）</li>
           <li>法人化後の残余利益は法人内留保として計算（役員報酬以外の分配なし）</li>
           <li>消費税の扱いは考慮していません（新設法人は原則2年間免税）</li>
