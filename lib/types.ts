@@ -14,6 +14,7 @@ export interface InputData {
   medicalExpenses: number      // 医療費控除（10万円超の部分）
   lifeInsuranceDeduction: number // 生命保険料控除（最大12万円）
   earthquakeInsurance: number  // 地震保険料控除（最大5万円）
+  donationDeduction: number    // 寄附金控除（ふるさと納税等・寄付金 − 2,000円）
   // 法人化後の詳細設定
   spouseDirectorSalary: number // 配偶者役員報酬（年額・0なら設定なし）
 }

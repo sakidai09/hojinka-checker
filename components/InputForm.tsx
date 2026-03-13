@@ -155,6 +155,12 @@ function DeductionAccordion({ data, onChange }: { data: InputData; onChange: (d:
             onChange={(v) => set('earthquakeInsurance', Math.min(v, 50_000))}
             hint="支払保険料の全額（最大5万円）"
           />
+          <MoneyInput
+            label="寄附金控除（ふるさと納税等）"
+            value={data.donationDeduction}
+            onChange={(v) => set('donationDeduction', v)}
+            hint="寄付金額 − 2,000円。確定申告書の「寄附金控除」欄の金額"
+          />
         </div>
       )}
     </div>
@@ -197,6 +203,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
         ...(d.lifeInsuranceDeduction != null && { lifeInsuranceDeduction: Math.min(d.lifeInsuranceDeduction, 120_000) }),
         ...(d.earthquakeInsurance != null && { earthquakeInsurance: Math.min(d.earthquakeInsurance, 50_000) }),
         ...(d.mortgageDeduction != null && { mortgageDeduction: d.mortgageDeduction }),
+        ...(d.donationDeduction != null && { donationDeduction: d.donationDeduction }),
       })
       setOcrStatus('done')
     } catch (e: unknown) {

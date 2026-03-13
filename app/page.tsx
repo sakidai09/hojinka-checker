@@ -37,6 +37,7 @@ const DEFAULT_INPUT: InputData = {
   medicalExpenses: 0,
   lifeInsuranceDeduction: 0,
   earthquakeInsurance: 0,
+  donationDeduction: 0,
   spouseDirectorSalary: 0,
 }
 

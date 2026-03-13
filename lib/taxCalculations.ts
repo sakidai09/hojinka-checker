@@ -57,6 +57,7 @@ export function calcIndividual(input: InputData): IndividualResult {
       - input.medicalExpenses
       - input.lifeInsuranceDeduction
       - input.earthquakeInsurance
+      - input.donationDeduction
   )
 
   // 所得税（復興特別所得税 2.1% 込み）住宅ローン控除は税額から直接控除
@@ -130,6 +131,7 @@ export function calcCorporate(input: InputData): CorporateResult {
       - input.lifeInsuranceDeduction
       - input.earthquakeInsurance
       - input.medicalExpenses
+      - input.donationDeduction
   )
 
   const directorIncomeTaxBase = Math.floor(calcIncomeTax(directorTaxable) * 1.021)
