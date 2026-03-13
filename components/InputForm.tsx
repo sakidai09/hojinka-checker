@@ -59,8 +59,10 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
   const [dragging, setDragging] = useState(false)
 
   const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setOcrError('画像ファイル（JPG / PNG）をアップロードしてください')
+    const isImage = file.type.startsWith('image/')
+    const isPdf = file.type === 'application/pdf'
+    if (!isImage && !isPdf) {
+      setOcrError('JPG / PNG / PDF ファイルをアップロードしてください')
       setOcrStatus('error')
       return
     }
@@ -126,7 +128,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,application/pdf"
             className="hidden"
             onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
           />
@@ -149,7 +151,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
               <span className="text-2xl">📄</span>
               <div className="text-left">
                 <p className="text-sm font-medium text-gray-600">タップして画像を選択</p>
-                <p className="text-xs">またはドラッグ＆ドロップ　JPG / PNG 対応</p>
+                <p className="text-xs">またはドラッグ＆ドロップ　JPG / PNG / PDF 対応</p>
               </div>
             </div>
           )}

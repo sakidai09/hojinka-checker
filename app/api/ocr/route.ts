@@ -3,43 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-export async function POST(req: NextRequest) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'APIキーが設定されていません。環境変数 ANTHROPIC_API_KEY を設定してください。' }, { status: 500 })
-  }
-
-  try {
-    const formData = await req.formData()
-    const file = formData.get('file') as File
-    if (!file) {
-      return NextResponse.json({ error: 'ファイルがありません' }, { status: 400 })
-    }
-
-    // MIMEタイプを安全に取得
-    const rawType = file.type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'] as const
-    type AllowedType = typeof allowedTypes[number]
-    const mediaType: AllowedType = allowedTypes.includes(rawType as AllowedType)
-      ? (rawType as AllowedType)
-      : 'image/jpeg'
-
-    const bytes = await file.arrayBuffer()
-    const base64 = Buffer.from(bytes).toString('base64')
-
-    const message = await client.messages.create({
-      model: 'claude-opus-4-5',
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: mediaType, data: base64 },
-            },
-            {
-              type: 'text',
-              text: `この画像は日本の確定申告書や収支内訳書・青色申告決算書のいずれかです。
+const PROMPT = `この書類は日本の確定申告書や収支内訳書・青色申告決算書のいずれかです。
 以下の手順でJSONを返してください。説明文は不要でJSONのみ返してください。
 
 【確定申告書B 第一表の場合の読み取り方】
@@ -63,9 +27,53 @@ export async function POST(req: NextRequest) {
   "businessIncome": 数値またはnull,
   "blueFormDeduction": 数値またはnull,
   "familyWorkerSalary": 数値またはnull
-}`,
-            },
-          ],
+}`
+
+export async function POST(req: NextRequest) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json(
+      { error: 'APIキーが設定されていません。環境変数 ANTHROPIC_API_KEY を設定してください。' },
+      { status: 500 }
+    )
+  }
+
+  try {
+    const formData = await req.formData()
+    const file = formData.get('file') as File
+    if (!file) {
+      return NextResponse.json({ error: 'ファイルがありません' }, { status: 400 })
+    }
+
+    const bytes = await file.arrayBuffer()
+    const base64 = Buffer.from(bytes).toString('base64')
+    const isPdf = file.type === 'application/pdf'
+
+    // PDFと画像でコンテンツブロックを切り替え
+    const fileBlock = isPdf
+      ? ({
+          type: 'document',
+          source: { type: 'base64', media_type: 'application/pdf', data: base64 },
+        } as const)
+      : ({
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: (
+              ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)
+                ? file.type
+                : 'image/jpeg'
+            ) as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+            data: base64,
+          },
+        } as const)
+
+    const message = await client.messages.create({
+      model: 'claude-opus-4-5',
+      max_tokens: 1024,
+      messages: [
+        {
+          role: 'user',
+          content: [fileBlock, { type: 'text', text: PROMPT }],
         },
       ],
     })
@@ -73,17 +81,18 @@ export async function POST(req: NextRequest) {
     const text = message.content[0].type === 'text' ? message.content[0].text.trim() : ''
     console.log('[OCR] Claude response:', text)
 
-    // ```json ... ``` や前後のテキストを除いてJSONを抽出
     const jsonMatch = text.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
       console.error('[OCR] JSON not found in response:', text)
-      return NextResponse.json({ error: `読み取り結果を解析できませんでした。別の画像をお試しください。`, raw: text }, { status: 422 })
+      return NextResponse.json(
+        { error: '読み取り結果を解析できませんでした。別のファイルをお試しください。', raw: text },
+        { status: 422 }
+      )
     }
 
     const extracted = JSON.parse(jsonMatch[0])
 
-    // 確定申告書B 第一表の場合: 経費合計を逆算
-    // 経費 = 売上高 - 事業所得 - 青色申告特別控除
+    // 確定申告書B 第一表の場合: 経費合計を逆算（売上高 - 事業所得 - 青色申告控除）
     if (extracted.expenses == null && extracted.revenue != null && extracted.businessIncome != null) {
       const blue = extracted.blueFormDeduction ?? 0
       const calc = extracted.revenue - extracted.businessIncome - blue
