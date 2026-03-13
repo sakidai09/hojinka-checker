@@ -52,7 +52,7 @@ export default function Home() {
       </main>
 
       <footer className="max-w-lg mx-auto px-4 pb-8 text-center text-xs text-gray-400">
-        本ツールの計算結果はあくまで参考値です。正確な税額・社会保険料は税理士・社労士にご相談ください。
+        本ツールの計算結果はあくまで参考値です。<br />正確な税額・社会保険料は税理士・社労士にご相談ください。
       </footer>
     </div>
   )
