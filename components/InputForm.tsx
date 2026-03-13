@@ -89,52 +89,82 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* 確定申告書アップロード */}
-      <div
-        onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault()
-          setDragging(false)
-          const file = e.dataTransfer.files[0]
-          if (file) handleFile(file)
-        }}
-        onClick={() => fileInputRef.current?.click()}
-        className={`cursor-pointer rounded-xl border-2 border-dashed p-5 text-center transition-colors ${
-          dragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300 bg-white hover:border-blue-300 hover:bg-gray-50'
-        }`}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
-        />
-        {ocrStatus === 'loading' ? (
-          <div className="flex flex-col items-center gap-2 text-blue-600">
-            <svg className="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
-            <p className="text-sm font-medium">確定申告書を読み取り中…</p>
-          </div>
-        ) : ocrStatus === 'done' ? (
-          <div className="flex flex-col items-center gap-1 text-green-600">
-            <span className="text-2xl">✅</span>
-            <p className="text-sm font-medium">読み取り完了！内容を確認してください</p>
-            <p className="text-xs text-gray-400">別の画像を読み込む場合はここをタップ</p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-2 text-gray-500">
-            <span className="text-3xl">📄</span>
-            <p className="text-sm font-medium text-gray-700">確定申告書の画像をアップロード</p>
-            <p className="text-xs">タップして選択 またはドラッグ＆ドロップ</p>
-            <p className="text-xs text-gray-400">JPG / PNG 対応 ・ AIが自動で数値を読み取ります</p>
-          </div>
-        )}
-        {ocrStatus === 'error' && (
-          <p className="mt-2 text-xs text-red-500">{ocrError}</p>
+
+      {/* STEP 1: 自動入力 */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold bg-blue-600 text-white px-2 py-0.5 rounded-full">STEP 1</span>
+          <span className="text-sm font-semibold text-gray-800">確定申告書で自動入力</span>
+          <span className="text-xs text-gray-400 ml-auto">任意</span>
+        </div>
+        <p className="text-xs text-gray-500">
+          以下いずれかの書類を撮影・スキャンした画像をアップロードすると、AIが数値を自動で読み取ります。
+        </p>
+        <div className="flex gap-2 flex-wrap">
+          {['確定申告書B 第一表', '収支内訳書', '青色申告決算書'].map((label) => (
+            <span key={label} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
+              ✓ {label}
+            </span>
+          ))}
+        </div>
+
+        {/* アップロードエリア */}
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault()
+            setDragging(false)
+            const file = e.dataTransfer.files[0]
+            if (file) handleFile(file)
+          }}
+          onClick={() => fileInputRef.current?.click()}
+          className={`cursor-pointer rounded-lg border-2 border-dashed py-4 text-center transition-colors ${
+            dragging ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50'
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
+          />
+          {ocrStatus === 'loading' ? (
+            <div className="flex flex-col items-center gap-2 text-blue-600">
+              <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+              <p className="text-sm font-medium">AIが数値を読み取り中…</p>
+            </div>
+          ) : ocrStatus === 'done' ? (
+            <div className="flex flex-col items-center gap-1 text-green-600">
+              <span className="text-xl">✅</span>
+              <p className="text-sm font-medium">読み取り完了！STEP 2 の内容を確認してください</p>
+              <p className="text-xs text-gray-400">別の画像を読み込む場合はここをタップ</p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-3 text-gray-400">
+              <span className="text-2xl">📄</span>
+              <div className="text-left">
+                <p className="text-sm font-medium text-gray-600">タップして画像を選択</p>
+                <p className="text-xs">またはドラッグ＆ドロップ　JPG / PNG 対応</p>
+              </div>
+            </div>
+          )}
+          {ocrStatus === 'error' && (
+            <p className="mt-2 text-xs text-red-500">{ocrError}</p>
+          )}
+        </div>
+      </div>
+
+      {/* STEP 2: 手動入力 */}
+      <div className="flex items-center gap-2 px-1">
+        <span className="text-xs font-bold bg-gray-700 text-white px-2 py-0.5 rounded-full">STEP 2</span>
+        <span className="text-sm font-semibold text-gray-800">内容を確認・入力</span>
+        {ocrStatus === 'done' && (
+          <span className="text-xs text-green-600 font-medium ml-auto">自動入力済み ✓</span>
         )}
       </div>
       {/* 売上・経費 */}
