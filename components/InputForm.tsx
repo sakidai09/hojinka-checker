@@ -363,11 +363,14 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
             扶養家族の数（配偶者除く）
           </label>
           <input
-            type="number"
-            min={0}
-            max={10}
-            value={data.dependents}
-            onChange={(e) => set('dependents', Number(e.target.value) || 0)}
+            type="text"
+            inputMode="numeric"
+            value={data.dependents === 0 ? '' : String(data.dependents)}
+            onChange={(e) => {
+              const raw = e.target.value.replace(/[^\d]/g, '')
+              set('dependents', raw === '' ? 0 : Math.min(parseInt(raw, 10), 10))
+            }}
+            placeholder="0"
             className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -381,11 +384,14 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           <label className="block text-sm font-medium text-gray-700 mb-1">年齢</label>
           <p className="text-xs text-gray-400 mb-1">40歳以上は国保の介護分が加算されます</p>
           <input
-            type="number"
-            min={20}
-            max={80}
-            value={data.age}
-            onChange={(e) => set('age', Number(e.target.value) || 40)}
+            type="text"
+            inputMode="numeric"
+            value={data.age === 0 ? '' : String(data.age)}
+            onChange={(e) => {
+              const raw = e.target.value.replace(/[^\d]/g, '')
+              set('age', raw === '' ? 0 : Math.min(parseInt(raw, 10), 99))
+            }}
+            placeholder="40"
             className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
