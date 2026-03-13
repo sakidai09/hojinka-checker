@@ -53,6 +53,58 @@ function MoneyInput({
   )
 }
 
+function DirectorSalaryInput({
+  value,
+  onChange,
+}: {
+  value: number
+  onChange: (v: number) => void
+}) {
+  const [focused, setFocused] = useState(false)
+
+  const displayValue = focused
+    ? (value === 0 ? '' : String(value))
+    : (value === 0 ? '' : value.toLocaleString())
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^\d]/g, '')
+    onChange(raw === '' ? 0 : parseInt(raw, 10))
+  }
+
+  const monthly = value > 0 ? Math.round(value / 12) : null
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        希望する役員報酬（<span className="font-bold text-gray-900">年額</span>）
+      </label>
+      <p className="text-xs text-gray-400 mb-1">自分への給与として設定する金額</p>
+      <div className="flex items-center gap-3">
+        <div className="relative w-1/2">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">¥</span>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={displayValue}
+            onChange={handleChange}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder="0"
+            className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div className="text-sm text-gray-500">
+          {monthly !== null ? (
+            <>月額 <span className="font-semibold text-gray-800">¥{monthly.toLocaleString()}</span></>
+          ) : (
+            <span className="text-gray-300">月額 —</span>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
@@ -282,11 +334,9 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
 
       {/* 法人化後の設定 */}
       <Section title="🏢 法人化後のシミュレーション">
-        <MoneyInput
-          label="希望する役員報酬（年額）"
+        <DirectorSalaryInput
           value={data.directorSalary}
           onChange={(v) => set('directorSalary', v)}
-          hint="自分への給与として設定する金額"
         />
         <div className="bg-blue-50 rounded-lg p-3 text-xs text-blue-700 space-y-2">
           <p>💡 役員報酬は会社の経費になります。給与所得控除も使えるため個人事業主より節税効果があります。残りの利益は法人に留保されます。</p>
