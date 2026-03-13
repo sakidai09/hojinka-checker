@@ -22,7 +22,6 @@ function MoneyInput({
 }) {
   const [focused, setFocused] = useState(false)
 
-  // フォーカス中は生の数字、離脱時は3桁カンマ付き
   const displayValue = focused
     ? (value === 0 ? '' : String(value))
     : (value === 0 ? '' : value.toLocaleString())
@@ -110,6 +109,54 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
       <h2 className="font-semibold text-gray-800">{title}</h2>
       {children}
+    </div>
+  )
+}
+
+// アコーディオン（詳細控除）
+function DeductionAccordion({ data, onChange }: { data: InputData; onChange: (d: InputData) => void }) {
+  const [open, setOpen] = useState(false)
+  const set = <K extends keyof InputData>(key: K, value: InputData[K]) =>
+    onChange({ ...data, [key]: value })
+
+  return (
+    <div className="border-t border-gray-100 pt-3">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 text-sm text-blue-600 font-medium"
+      >
+        <span className={`inline-block transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>▶</span>
+        その他の控除を追加する（任意）
+      </button>
+      {open && (
+        <div className="mt-4 space-y-4">
+          <MoneyInput
+            label="住宅ローン控除（年間）"
+            value={data.mortgageDeduction}
+            onChange={(v) => set('mortgageDeduction', v)}
+            hint="税額控除額（年末残高×0.7%）。確定申告書の住宅借入金等特別控除額"
+          />
+          <MoneyInput
+            label="医療費控除"
+            value={data.medicalExpenses}
+            onChange={(v) => set('medicalExpenses', v)}
+            hint="実際の医療費 − 10万円（または所得×5%）の超過分"
+          />
+          <MoneyInput
+            label="生命保険料控除"
+            value={data.lifeInsuranceDeduction}
+            onChange={(v) => set('lifeInsuranceDeduction', Math.min(v, 120_000))}
+            hint="新契約：一般・介護・個人年金の合計（最大12万円）"
+          />
+          <MoneyInput
+            label="地震保険料控除"
+            value={data.earthquakeInsurance}
+            onChange={(v) => set('earthquakeInsurance', Math.min(v, 50_000))}
+            hint="支払保険料の全額（最大5万円）"
+          />
+        </div>
+      )}
     </div>
   )
 }
@@ -230,6 +277,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           <span className="text-xs text-green-600 font-medium ml-auto">自動入力済み ✓</span>
         )}
       </div>
+
       {/* 売上・経費 */}
       <Section title="📊 売上・経費">
         <MoneyInput
@@ -249,7 +297,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           <select
             value={data.blueFormDeduction}
             onChange={(e) => set('blueFormDeduction', Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value={650000}>65万円（電子申告・複式簿記）</option>
             <option value={550000}>55万円（複式簿記）</option>
@@ -268,7 +316,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           <select
             value={data.industryTaxRate}
             onChange={(e) => set('industryTaxRate', Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value={0.05}>5%（一般的な事業）</option>
             <option value={0.04}>4%（畜産業・水産業など）</option>
@@ -283,7 +331,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-sm font-medium text-gray-700">配偶者あり</p>
-            <p className="text-xs text-gray-400">配偶者の所得が48万円以下</p>
+            <p className="text-xs text-gray-400">配偶者の所得が48万円以下の場合に控除対象</p>
           </div>
           <button
             type="button"
@@ -330,6 +378,8 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
             className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        {/* 詳細控除アコーディオン */}
+        <DeductionAccordion data={data} onChange={onChange} />
       </Section>
 
       {/* 法人化後の設定 */}
@@ -338,6 +388,17 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           value={data.directorSalary}
           onChange={(v) => set('directorSalary', v)}
         />
+        <MoneyInput
+          label="配偶者役員報酬（年額）"
+          value={data.spouseDirectorSalary}
+          onChange={(v) => set('spouseDirectorSalary', v)}
+          hint="配偶者を役員にして給与を分散する場合に入力。0なら設定なし"
+        />
+        {data.spouseDirectorSalary > 0 && data.hasSpouse && (
+          <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
+            ⚠️ 配偶者が役員として給与を受け取る場合、代表者の配偶者控除（38万円）は適用されません。法人化後の計算では自動的に除外しています。
+          </p>
+        )}
         <div className="bg-blue-50 rounded-lg p-3 text-xs text-blue-700 space-y-2">
           <p>💡 役員報酬は会社の経費になります。給与所得控除も使えるため個人事業主より節税効果があります。残りの利益は法人に留保されます。</p>
           <hr className="border-blue-200" />

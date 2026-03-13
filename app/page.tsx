@@ -18,6 +18,12 @@ const DEFAULT_INPUT: InputData = {
   age: 40,
   directorSalary: 540_000,
   industryTaxRate: 0.05,
+  // 追加控除（詳細設定）
+  mortgageDeduction: 0,
+  medicalExpenses: 0,
+  lifeInsuranceDeduction: 0,
+  earthquakeInsurance: 0,
+  spouseDirectorSalary: 0,
 }
 
 export default function Home() {
@@ -53,6 +59,7 @@ export default function Home() {
 
       <footer className="max-w-lg mx-auto px-4 pb-8 text-center text-xs text-gray-400">
         本ツールの計算結果はあくまで参考値です。<br />正確な税額・社会保険料は税理士・社労士にご相談ください。
+        <p className="mt-2 text-gray-300">v{process.env.NEXT_PUBLIC_APP_VERSION}</p>
       </footer>
     </div>
   )

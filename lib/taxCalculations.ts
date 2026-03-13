@@ -33,7 +33,6 @@ function calcSalaryDeduction(salary: number): number {
 // 標準報酬月額（厚生年金・健康保険の等級ベース）
 function calcStandardMonthly(annualSalary: number): number {
   const monthly = annualSalary / 12
-  // 厚生年金の上限（2024年度）: 650,000円/月
   return Math.min(Math.ceil(monthly / 1000) * 1000, 650_000)
 }
 
@@ -44,17 +43,25 @@ export function calcIndividual(input: InputData): IndividualResult {
     input.revenue - input.expenses - input.blueFormDeduction - input.familyWorkerSalary
   )
 
-  const basicDeduction   = 480_000
-  const spouseDeduction  = input.hasSpouse ? 380_000 : 0
+  const basicDeduction     = 480_000
+  const spouseDeduction    = input.hasSpouse ? 380_000 : 0
   const dependentDeduction = input.dependents * 380_000
 
   const taxableIncome = Math.max(
     0,
-    businessIncome - basicDeduction - spouseDeduction - dependentDeduction - input.ideco
+    businessIncome
+      - basicDeduction
+      - spouseDeduction
+      - dependentDeduction
+      - input.ideco
+      - input.medicalExpenses
+      - input.lifeInsuranceDeduction
+      - input.earthquakeInsurance
   )
 
-  // 所得税（復興特別所得税 2.1% 込み）
-  const incomeTax = Math.floor(calcIncomeTax(taxableIncome) * 1.021)
+  // 所得税（復興特別所得税 2.1% 込み）住宅ローン控除は税額から直接控除
+  const incomeTaxBase = Math.floor(calcIncomeTax(taxableIncome) * 1.021)
+  const incomeTax = Math.max(0, incomeTaxBase - input.mortgageDeduction)
 
   // 住民税（所得割 10% + 均等割 5,000円）
   const residentTax = Math.floor(taxableIncome * 0.10) + 5_000
@@ -92,38 +99,84 @@ export function calcIndividual(input: InputData): IndividualResult {
 export function calcCorporate(input: InputData): CorporateResult {
   const { directorSalary: salary } = input
 
-  // 役員報酬の給与所得
+  // ── 代表者（役員）の計算 ──
   const salaryDeduction  = calcSalaryDeduction(salary)
   const employmentIncome = Math.max(0, salary - salaryDeduction)
 
   // 社会保険（協会けんぽ 東京 2024年度）
   const stdMonthly = calcStandardMonthly(salary)
-  const healthEmployee  = Math.floor(stdMonthly * 12 * 0.0499)   // 健康保険 従業員
-  const pensionEmployee = Math.floor(stdMonthly * 12 * 0.0915)   // 厚生年金 従業員
+  const healthEmployee  = Math.floor(stdMonthly * 12 * 0.0499)
+  const pensionEmployee = Math.floor(stdMonthly * 12 * 0.0915)
   const socialInsEmployee = healthEmployee + pensionEmployee
 
-  const healthEmployer  = Math.floor(stdMonthly * 12 * 0.0499)   // 健康保険 会社
-  const pensionEmployer = Math.floor(stdMonthly * 12 * 0.0915)   // 厚生年金 会社
-  const childcareEmployer = Math.floor(stdMonthly * 12 * 0.0036) // 子ども・子育て拠出金
+  const healthEmployer    = Math.floor(stdMonthly * 12 * 0.0499)
+  const pensionEmployer   = Math.floor(stdMonthly * 12 * 0.0915)
+  const childcareEmployer = Math.floor(stdMonthly * 12 * 0.0036)
   const socialInsEmployer = healthEmployer + pensionEmployer + childcareEmployer
 
-  // 役員の課税所得（社保は所得控除対象）
-  const basicDeduction     = 480_000
-  const spouseDeduction    = input.hasSpouse ? 380_000 : 0
+  // 配偶者役員がいる場合、代表者の配偶者控除は不適用
+  const spouseDeduction    = (input.hasSpouse && input.spouseDirectorSalary === 0) ? 380_000 : 0
   const dependentDeduction = input.dependents * 380_000
+  const basicDeduction     = 480_000
+
   const directorTaxable = Math.max(
     0,
-    employmentIncome - basicDeduction - spouseDeduction - dependentDeduction - input.ideco - socialInsEmployee
+    employmentIncome
+      - basicDeduction
+      - spouseDeduction
+      - dependentDeduction
+      - input.ideco
+      - socialInsEmployee
+      - input.lifeInsuranceDeduction
+      - input.earthquakeInsurance
+      - input.medicalExpenses
   )
 
-  const directorIncomeTax  = Math.floor(calcIncomeTax(directorTaxable) * 1.021)
+  const directorIncomeTaxBase = Math.floor(calcIncomeTax(directorTaxable) * 1.021)
+  const directorIncomeTax  = Math.max(0, directorIncomeTaxBase - input.mortgageDeduction)
   const directorResidentTax = Math.floor(directorTaxable * 0.10) + 5_000
   const directorTotal = directorIncomeTax + directorResidentTax + socialInsEmployee
 
-  // 法人の課税所得
+  // ── 配偶者役員の計算（設定した場合のみ）──
+  let spouseDirector: CorporateResult['spouseDirector'] = null
+  let socialInsSpouseEmployer = 0
+
+  if (input.spouseDirectorSalary > 0) {
+    const spouseStdMonthly = calcStandardMonthly(input.spouseDirectorSalary)
+    const spouseHealthEmp   = Math.floor(spouseStdMonthly * 12 * 0.0499)
+    const spousePensionEmp  = Math.floor(spouseStdMonthly * 12 * 0.0915)
+    const spouseInsEmployee = spouseHealthEmp + spousePensionEmp
+
+    const spouseHealthEr     = Math.floor(spouseStdMonthly * 12 * 0.0499)
+    const spousePensionEr    = Math.floor(spouseStdMonthly * 12 * 0.0915)
+    const spouseChildcareEr  = Math.floor(spouseStdMonthly * 12 * 0.0036)
+    socialInsSpouseEmployer  = spouseHealthEr + spousePensionEr + spouseChildcareEr
+
+    const spouseSalDed      = calcSalaryDeduction(input.spouseDirectorSalary)
+    const spouseEmpIncome   = Math.max(0, input.spouseDirectorSalary - spouseSalDed)
+    const spouseTaxable     = Math.max(0, spouseEmpIncome - 480_000 - spouseInsEmployee)
+    const spouseIncomeTax   = Math.max(0, Math.floor(calcIncomeTax(spouseTaxable) * 1.021))
+    const spouseResidentTax = Math.floor(spouseTaxable * 0.10) + 5_000
+    const spouseTotal = spouseIncomeTax + spouseResidentTax + spouseInsEmployee
+
+    spouseDirector = {
+      salary: input.spouseDirectorSalary,
+      incomeTax: spouseIncomeTax,
+      residentTax: spouseResidentTax,
+      socialInsurance: spouseInsEmployee,
+      total: spouseTotal,
+    }
+  }
+
+  // ── 法人の課税所得 ──
   const corporateIncome = Math.max(
     0,
-    input.revenue - input.expenses - salary - socialInsEmployer
+    input.revenue
+      - input.expenses
+      - salary
+      - socialInsEmployer
+      - (spouseDirector ? input.spouseDirectorSalary : 0)
+      - socialInsSpouseEmployer
   )
 
   // 法人税（中小法人 資本金1億円以下）
@@ -140,8 +193,8 @@ export function calcCorporate(input: InputData): CorporateResult {
   const localNationalTax = Math.floor(nationalTax * 0.103)
 
   // 法人住民税（法人税割 + 均等割）
-  const residentTaxRatio = Math.floor(nationalTax * 0.07)
-  const fixedResidentTax = 70_000
+  const residentTaxRatio    = Math.floor(nationalTax * 0.07)
+  const fixedResidentTax    = 70_000
   const corporateResidentTax = residentTaxRatio + fixedResidentTax
 
   // 法人事業税
@@ -157,10 +210,13 @@ export function calcCorporate(input: InputData): CorporateResult {
   }
   const specialBizTax = Math.floor(bizTax * 0.37)
   const corporateBusinessTax = bizTax + specialBizTax
-
   const corporateTaxTotal = nationalTax + localNationalTax + corporateResidentTax + corporateBusinessTax
 
-  const totalBurden = directorTotal + corporateTaxTotal + socialInsEmployer
+  const totalBurden =
+    directorTotal
+    + corporateTaxTotal
+    + socialInsEmployer
+    + (spouseDirector ? spouseDirector.total + socialInsSpouseEmployer : 0)
 
   return {
     director: {
@@ -179,7 +235,9 @@ export function calcCorporate(input: InputData): CorporateResult {
       businessTax: corporateBusinessTax,
       total: corporateTaxTotal,
     },
+    spouseDirector,
     socialInsuranceEmployer: socialInsEmployer,
+    socialInsuranceSpouseEmployer: socialInsSpouseEmployer,
     totalBurden,
   }
 }

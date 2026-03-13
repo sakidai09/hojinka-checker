@@ -39,32 +39,28 @@ export default function ResultDisplay({
   const verdictConfig = {
     incorporate: {
       bg: 'bg-green-50 border-green-200',
-      badge: 'bg-green-500',
       icon: '✅',
       title: '法人化を強くおすすめします',
       desc: `年間 ${yen(savings)} の節税効果があります。設立費用（約25万円）は${breakEvenYears}年以内に回収できます。`,
     },
     consider: {
       bg: 'bg-yellow-50 border-yellow-200',
-      badge: 'bg-yellow-500',
       icon: '🤔',
       title: '法人化を検討する価値あり',
-      desc: `年間 ${yen(savings)} の節税効果があります。ただし事務負担の増加も考慮してください。`,
+      desc: `年間 ${yen(savings)} の節税効果があります。ただし下記の追加コストも考慮してください。`,
     },
     not_yet: {
       bg: 'bg-red-50 border-red-200',
-      badge: 'bg-red-400',
       icon: '⏳',
       title: 'まだ法人化は早いかもしれません',
       desc: `現状では法人化によりコストが ${yen(Math.abs(savings))} 増加します。売上増加後に再検討をおすすめします。`,
     },
   }[verdict]
 
-  const indTotal   = individual.total
-  const corpTotal  = corporation.totalBurden
+  const indTotal  = individual.total
+  const corpTotal = corporation.totalBurden
 
-  // バーチャートの幅計算
-  const maxVal = Math.max(indTotal, corpTotal)
+  const maxVal    = Math.max(indTotal, corpTotal)
   const indWidth  = Math.round((indTotal / maxVal) * 100)
   const corpWidth = Math.round((corpTotal / maxVal) * 100)
 
@@ -81,6 +77,36 @@ export default function ResultDisplay({
         </div>
       </div>
 
+      {/* 法人化後の追加コスト（incorporate / consider のみ） */}
+      {(verdict === 'incorporate' || verdict === 'consider') && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-800 space-y-2">
+          <p className="font-semibold text-sm">⚠️ 試算に含まれていない追加コスト</p>
+          <table className="w-full">
+            <tbody className="divide-y divide-amber-100">
+              <tr>
+                <td className="py-1.5 text-amber-700">税理士・顧問費用</td>
+                <td className="py-1.5 text-right font-medium text-amber-900">年 200,000〜400,000円</td>
+              </tr>
+              <tr>
+                <td className="py-1.5 text-amber-700">会計ソフト（freee / MFクラウド等）</td>
+                <td className="py-1.5 text-right font-medium text-amber-900">年 35,000〜40,000円</td>
+              </tr>
+              <tr>
+                <td className="py-1.5 text-amber-700">合同会社設立費用（一度のみ）</td>
+                <td className="py-1.5 text-right font-medium text-amber-900">約 60,000円</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr className="border-t border-amber-300">
+                <td className="pt-2 font-semibold text-amber-900">年間追加コスト目安</td>
+                <td className="pt-2 text-right font-bold text-amber-900">年 235,000〜440,000円</td>
+              </tr>
+            </tfoot>
+          </table>
+          <p className="text-amber-600">法人住民税均等割（年7万円・赤字でも発生）は上記試算に含まれています。</p>
+        </div>
+      )}
+
       {/* バーチャート */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">
         <h3 className="font-semibold text-gray-800 mb-4">税金・社会保険料の比較</h3>
@@ -88,7 +114,7 @@ export default function ResultDisplay({
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span className="text-gray-600">個人事業主のまま</span>
-              <span className="font-medium">{yen(indTotal)}</span>
+              <span className="font-semibold text-gray-800">{yen(indTotal)}</span>
             </div>
             <div className="h-8 bg-gray-100 rounded-lg overflow-hidden">
               <div
@@ -100,7 +126,7 @@ export default function ResultDisplay({
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span className="text-gray-600">法人化した場合</span>
-              <span className="font-medium">{yen(corpTotal)}</span>
+              <span className="font-semibold text-gray-800">{yen(corpTotal)}</span>
             </div>
             <div className="h-8 bg-gray-100 rounded-lg overflow-hidden">
               <div
@@ -131,10 +157,17 @@ export default function ResultDisplay({
             </thead>
             <tbody className="divide-y divide-gray-100">
               <Row
-                label="事業所得 / 役員報酬"
+                label="事業所得 / 役員報酬（代表者）"
                 individual={individual.businessIncome}
                 corporation={corporation.director.salary}
               />
+              {corporation.spouseDirector && (
+                <Row
+                  label="役員報酬（配偶者）"
+                  individual={0}
+                  corporation={corporation.spouseDirector.salary}
+                />
+              )}
               <Row
                 label="所得税（復興税込）"
                 individual={individual.incomeTax}
@@ -160,6 +193,15 @@ export default function ResultDisplay({
                 individual={0}
                 corporation={corporation.socialInsuranceEmployer}
               />
+              {corporation.spouseDirector && (
+                <Row
+                  label="配偶者役員 税・社保合計"
+                  individual={0}
+                  corporation={
+                    corporation.spouseDirector.total + corporation.socialInsuranceSpouseEmployer
+                  }
+                />
+              )}
               <Row
                 label="合計負担額"
                 individual={indTotal}
