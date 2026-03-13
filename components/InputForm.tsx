@@ -36,7 +36,7 @@ function MoneyInput({
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       {hint && <p className="text-xs text-gray-400 mb-1">{hint}</p>}
-      <div className="relative">
+      <div className="relative w-1/2">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">¥</span>
         <input
           type="text"
@@ -309,7 +309,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
             max={10}
             value={data.dependents}
             onChange={(e) => set('dependents', Number(e.target.value) || 0)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <MoneyInput
@@ -327,7 +327,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
             max={80}
             value={data.age}
             onChange={(e) => set('age', Number(e.target.value) || 40)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </Section>
