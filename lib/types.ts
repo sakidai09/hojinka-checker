@@ -68,4 +68,5 @@ export interface ComparisonResult {
   savings: number              // 節税効果（プラスなら法人有利）
   verdict: Verdict
   breakEvenYears: number       // 設立コスト回収年数
+  tippingPointBusinessIncome?: number // not_yet時: 法人化が有利になる事業所得の目安
 }

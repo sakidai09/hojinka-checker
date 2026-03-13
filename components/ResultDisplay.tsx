@@ -127,7 +127,17 @@ export default function ResultDisplay({
             </ul>
             <div className="border-t border-blue-200 pt-3 text-xs text-blue-700">
               <span className="font-semibold">法人化が有利になる目安：</span>
-              事業所得が概ね <span className="font-semibold">600〜800万円超</span> になると法人化による節税メリットが出やすくなります。売上・利益が増えたタイミングで再シミュレーションしてみましょう。
+              {result.tippingPointBusinessIncome != null ? (
+                <>
+                  現在の条件では、事業所得が約{' '}
+                  <span className="font-semibold">
+                    {(result.tippingPointBusinessIncome / 10_000).toLocaleString()}万円
+                  </span>
+                  {' '}を超えると法人化が有利になる可能性があります。売上・利益が増えたタイミングで再シミュレーションしてみましょう。
+                </>
+              ) : (
+                '現在の役員報酬設定では、売上が大幅に増えても法人化のメリットが出にくい可能性があります。役員報酬額を見直してから再シミュレーションしてみましょう。'
+              )}
             </div>
           </div>
         )

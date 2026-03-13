@@ -97,12 +97,7 @@ export default function Home() {
 
       <footer className="max-w-lg mx-auto px-4 pb-8 text-center text-xs text-gray-400">
         本ツールの計算結果はあくまで参考値です。<br />正確な税額・社会保険料は税理士・社労士にご相談ください。
-        <p className="mt-2 text-gray-300">
-          v{process.env.NEXT_PUBLIC_APP_VERSION}
-          {process.env.NEXT_PUBLIC_BUILD_SHA !== 'local' && (
-            <span> ({process.env.NEXT_PUBLIC_BUILD_SHA})</span>
-          )}
-        </p>
+        <p className="mt-2 text-gray-300">v{process.env.NEXT_PUBLIC_APP_VERSION}</p>
       </footer>
     </div>
   )

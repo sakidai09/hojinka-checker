@@ -247,6 +247,40 @@ export function calcCorporate(input: InputData): CorporateResult {
 // ===== 比較・判定 =====
 const INCORPORATION_COST = 250_000  // 法人設立費用の概算
 
+// 法人化が有利になる事業所得の損益分岐点を二分探索で算出
+function findTippingPoint(input: InputData): number | null {
+  const fixedDeductions = input.expenses + input.blueFormDeduction + input.familyWorkerSalary
+
+  // 上限: 事業所得 3,000万円 まで探索
+  const maxBI = 30_000_000
+  const maxRevenue = maxBI + fixedDeductions
+  const maxSavings =
+    calcIndividual({ ...input, revenue: maxRevenue }).total -
+    calcCorporate({ ...input, revenue: maxRevenue }).totalBurden
+
+  if (maxSavings < 0) return null // 3,000万円でも法人化が有利にならない
+
+  let lo = input.revenue
+  let hi = maxRevenue
+
+  for (let i = 0; i < 60; i++) {
+    const mid = Math.floor((lo + hi) / 2)
+    const savings =
+      calcIndividual({ ...input, revenue: mid }).total -
+      calcCorporate({ ...input, revenue: mid }).totalBurden
+    if (savings >= 0) {
+      hi = mid
+    } else {
+      lo = mid
+    }
+    if (hi - lo < 10_000) break
+  }
+
+  // 事業所得に換算し、10万円単位で切り上げ
+  const tippingBI = hi - fixedDeductions
+  return Math.ceil(Math.max(0, tippingBI) / 100_000) * 100_000
+}
+
 export function compare(input: InputData): ComparisonResult {
   const individual  = calcIndividual(input)
   const corporation = calcCorporate(input)
@@ -266,5 +300,8 @@ export function compare(input: InputData): ComparisonResult {
     ? Math.ceil(INCORPORATION_COST / savings)
     : Infinity
 
-  return { individual, corporation, savings, verdict, breakEvenYears }
+  const tippingPointBusinessIncome =
+    verdict === 'not_yet' ? findTippingPoint(input) ?? undefined : undefined
+
+  return { individual, corporation, savings, verdict, breakEvenYears, tippingPointBusinessIncome }
 }
