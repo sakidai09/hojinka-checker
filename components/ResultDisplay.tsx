@@ -106,29 +106,38 @@ export default function ResultDisplay({
   const indWidth = Math.round((indTotal / maxVal) * 100)
   const corpWidth = Math.round((corpTotal / maxVal) * 100)
 
-  // ── スライダーのバー ──────────────────────────────────
+  // ── スライダー計算 ────────────────────────────────────
   const sliderIndTotal = sliderResult.individual.total
   const sliderCorpTotal = sliderResult.corporation.totalBurden
-  const sliderMaxVal = Math.max(sliderIndTotal, sliderCorpTotal)
-  const sliderIndWidth = Math.round((sliderIndTotal / sliderMaxVal) * 100)
-  const sliderCorpWidth = Math.round((sliderCorpTotal / sliderMaxVal) * 100)
 
   // ── 消費税免税メリット ────────────────────────────────
-  // 課税売上1,000万超の場合、個人では消費税を納付しているがらの新法人は2年間免税
   const vatPerYear = input.revenue > 10_000_000
     ? Math.round(Math.max(0, input.revenue - input.expenses) / 11)
     : 0
 
-  // ── 比較表の税率注 ────────────────────────────────────
-  // 所得税：実効税率・限界税率
-  const indMarginal = getMarginalRate(individual.taxableIncome)
-  const indEffective = individual.taxableIncome > 0
-    ? Math.round(individual.incomeTax / individual.taxableIncome * 1000) / 10
-    : 0
-  const corpMarginal = getMarginalRate(corporation.director.taxableIncome)
-  const corpEffective = corporation.director.taxableIncome > 0
-    ? Math.round(corporation.director.incomeTax / corporation.director.taxableIncome * 1000) / 10
-    : 0
+  // ── 比較表の実効税率 ──────────────────────────────────
+  const pct = (num: number, den: number) =>
+    den > 0 ? Math.round(num / den * 1000) / 10 : 0
+
+  // 所得税（課税所得ベース）
+  const indMarginal    = getMarginalRate(individual.taxableIncome)
+  const indEffective   = pct(individual.incomeTax, individual.taxableIncome)
+  const corpMarginal   = getMarginalRate(corporation.director.taxableIncome)
+  const corpEffective  = pct(corporation.director.incomeTax, corporation.director.taxableIncome)
+
+  // 住民税（事業所得 / 役員報酬ベース）
+  const indResEff  = pct(individual.residentTax,              individual.businessIncome)
+  const corpResEff = pct(corporation.director.residentTax,    corporation.director.salary)
+
+  // 個人事業税（事業所得ベース）
+  const indBizEff  = pct(individual.businessTax,              individual.businessIncome)
+  // 法人税等（法人課税所得ベース）
+  const corpTaxEff = pct(corporation.corporate.total,         corporation.corporate.income)
+
+  // 国保（事業所得ベース）
+  const nhiEff     = pct(individual.nhi,                      individual.businessIncome)
+  // 社保本人（役員報酬ベース）
+  const corpSocEff = pct(corporation.director.socialInsurance, corporation.director.salary)
 
   return (
     <div className="space-y-5">
@@ -274,18 +283,18 @@ export default function ResultDisplay({
         </div>
       </div>
 
-      {/* 役員報酬スライダー */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-        <h3 className="font-semibold text-gray-800">🔧 役員報酬を変えてシミュレーション</h3>
+      {/* 役員報酬スライダー（サブ） */}
+      <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
+        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">🔧 役員報酬でシミュレーション</p>
         <div>
           <div className="flex justify-between items-baseline mb-2">
-            <span className="text-base font-bold text-gray-900">¥{sliderSalary.toLocaleString()}<span className="text-sm font-normal text-gray-500">/年</span></span>
-            <span className="text-sm text-gray-500">月額 ¥{sliderMonthly.toLocaleString()}</span>
+            <span className="font-bold text-gray-900">
+              ¥{sliderSalary.toLocaleString()}<span className="text-sm font-normal text-gray-400">/年</span>
+            </span>
+            <span className="text-xs text-gray-400">月額 ¥{sliderMonthly.toLocaleString()}</span>
           </div>
           <input
-            type="range"
-            min={0} max={SLIDER_MAX} step={SLIDER_STEP}
-            value={sliderSalary}
+            type="range" min={0} max={SLIDER_MAX} step={SLIDER_STEP} value={sliderSalary}
             onChange={(e) => setSliderSalary(Number(e.target.value))}
             className="w-full h-2 accent-blue-500 cursor-pointer"
           />
@@ -294,34 +303,21 @@ export default function ResultDisplay({
           </div>
         </div>
 
-        {/* スライダーのバー比較 */}
-        <div className="space-y-3 pt-1">
-          <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-500">個人事業主のまま</span>
-              <span className="font-medium text-gray-700">{yen(sliderIndTotal)}</span>
-            </div>
-            <div className="h-5 bg-gray-100 rounded overflow-hidden">
-              <div className="h-full bg-orange-300 rounded transition-all duration-300" style={{ width: `${sliderIndWidth}%` }} />
-            </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-white rounded-lg p-2.5 text-center border border-gray-100">
+            <p className="text-xs text-gray-400 mb-0.5">個人事業主</p>
+            <p className="text-sm font-semibold text-gray-800">{yen(sliderIndTotal)}</p>
           </div>
-          <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-500">法人化（この役員報酬）</span>
-              <span className="font-medium text-gray-700">{yen(sliderCorpTotal)}</span>
-            </div>
-            <div className="h-5 bg-gray-100 rounded overflow-hidden">
-              <div className="h-full bg-blue-400 rounded transition-all duration-300" style={{ width: `${sliderCorpWidth}%` }} />
-            </div>
+          <div className="bg-white rounded-lg p-2.5 text-center border border-gray-100">
+            <p className="text-xs text-gray-400 mb-0.5">法人化（この報酬）</p>
+            <p className="text-sm font-semibold text-gray-800">{yen(sliderCorpTotal)}</p>
           </div>
         </div>
 
-        <div className={`text-center text-sm font-semibold py-2 rounded-lg ${sliderSavings >= 500_000 ? 'bg-green-50 text-green-700' : sliderSavings >= 0 ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-600'}`}>
-          {sliderSavings >= 0
-            ? `年間 ${yen(sliderSavings)} の節税効果`
-            : `法人化でコスト ${yen(Math.abs(sliderSavings))} 増加`}
+        <div className={`text-center text-xs font-semibold py-1.5 rounded-lg ${sliderSavings >= 500_000 ? 'bg-green-50 text-green-700' : sliderSavings >= 0 ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-600'}`}>
+          {sliderSavings >= 0 ? `年間 ${yen(sliderSavings)} の節税効果` : `法人化でコスト ${yen(Math.abs(sliderSavings))} 増加`}
           {sliderSalary !== input.directorSalary && (
-            <span className="ml-2 text-xs font-normal opacity-70">
+            <span className="ml-1.5 font-normal opacity-70">
               （元の設定より {sliderSavings - savings >= 0 ? '+' : ''}{yen(sliderSavings - savings)}）
             </span>
           )}
@@ -329,7 +325,7 @@ export default function ResultDisplay({
 
         {sliderSalary !== input.directorSalary && (
           <button type="button" onClick={() => setSliderSalary(input.directorSalary)}
-            className="text-xs text-blue-500 hover:underline">
+            className="text-xs text-blue-500 hover:underline block">
             ← 元の設定（¥{input.directorSalary.toLocaleString()}/年）に戻す
           </button>
         )}
@@ -373,15 +369,18 @@ export default function ResultDisplay({
                 label="住民税"
                 individual={individual.residentTax}
                 corporation={corporation.director.residentTax}
-                note={{ ind: '所得割10% ＋ 均等割5,000円', corp: '所得割10% ＋ 均等割5,000円' }}
+                note={{
+                  ind:  `所得割10% ＋ 均等割5,000円（事業所得に対する実効${indResEff}%）`,
+                  corp: `所得割10% ＋ 均等割5,000円（役員報酬に対する実効${corpResEff}%）`,
+                }}
               />
               <Row
                 label="個人事業税 / 法人税等"
                 individual={individual.businessTax}
                 corporation={corporation.corporate.total}
                 note={{
-                  ind:  `税率${(input.industryTaxRate * 100).toFixed(0)}%（事業主控除290万円）`,
-                  corp: '15%（〜800万円）/ 23.2%（超過分）＋地方法人税・住民税・事業税',
+                  ind:  `税率${(input.industryTaxRate * 100).toFixed(0)}%（事業主控除290万円）→ 事業所得に対する実効${indBizEff}%`,
+                  corp: `15%（〜800万円）/ 23.2%（超過分）＋地方税 → 法人課税所得に対する実効${corpTaxEff}%`,
                 }}
               />
               <Row
@@ -389,15 +388,15 @@ export default function ResultDisplay({
                 individual={individual.socialInsurance}
                 corporation={corporation.director.socialInsurance}
                 note={{
-                  ind:  '国保（全国平均ベース）＋国民年金 16,980円/月',
-                  corp: '健保 4.99% ＋ 厚年 9.15%（本人負担・折半）',
+                  ind:  `国保（全国平均）＋国民年金16,980円/月 → 事業所得に対する実効${nhiEff}%`,
+                  corp: `健保4.99%＋厚年9.15%（折半）→ 役員報酬に対する実効${corpSocEff}%`,
                 }}
               />
               <Row
                 label="社会保険（会社負担）"
                 individual={0}
                 corporation={corporation.socialInsuranceEmployer}
-                note={{ corp: '健保 4.99% ＋ 厚年 9.15% ＋ 児童拠出金 0.36%（協会けんぽ東京2024年度）' }}
+                note={{ corp: `健保4.99%＋厚年9.15%＋児童拠出金0.36%（協会けんぽ東京2024年度）` }}
               />
               {corporation.spouseDirector && (
                 <Row
