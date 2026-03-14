@@ -9,16 +9,48 @@ function yen(n: number) {
   return `¥${Math.abs(n).toLocaleString()}`
 }
 
+// 所得税の限界税率（復興税前）
+function getMarginalRate(taxableIncome: number): number {
+  if (taxableIncome <= 1_950_000) return 5
+  if (taxableIncome <= 3_300_000) return 10
+  if (taxableIncome <= 6_950_000) return 20
+  if (taxableIncome <= 9_000_000) return 23
+  if (taxableIncome <= 18_000_000) return 33
+  if (taxableIncome <= 40_000_000) return 40
+  return 45
+}
+
+type NoteType = string | { ind?: string; corp?: string }
+
 function Row({
   label, individual, corporation, highlight, note,
 }: {
-  label: string; individual: number; corporation: number; highlight?: boolean; note?: string
+  label: string; individual: number; corporation: number; highlight?: boolean; note?: NoteType
 }) {
   return (
     <tr className={highlight ? 'font-semibold bg-gray-50' : ''}>
       <td className="py-2 pr-3 text-sm text-gray-600">
         <span className="whitespace-nowrap">{label}</span>
-        {note && <span className="block text-xs text-gray-400 font-normal leading-tight mt-0.5">{note}</span>}
+        {note && (
+          typeof note === 'string' ? (
+            <span className="block text-xs text-gray-400 font-normal leading-tight mt-0.5">{note}</span>
+          ) : (
+            <span className="block text-xs font-normal leading-snug mt-0.5 space-y-0.5">
+              {note.ind && (
+                <span className="block">
+                  <span className="text-orange-500 font-medium">個人</span>
+                  <span className="text-gray-400">：{note.ind}</span>
+                </span>
+              )}
+              {note.corp && (
+                <span className="block">
+                  <span className="text-blue-500 font-medium">法人</span>
+                  <span className="text-gray-400">：{note.corp}</span>
+                </span>
+              )}
+            </span>
+          )
+        )}
       </td>
       <td className={`py-2 px-2 text-sm text-right whitespace-nowrap ${highlight ? 'text-gray-900' : 'text-gray-800'}`}>{yen(individual)}</td>
       <td className={`py-2 px-2 text-sm text-right whitespace-nowrap ${highlight ? 'text-gray-900' : 'text-gray-800'}`}>{yen(corporation)}</td>
@@ -88,7 +120,15 @@ export default function ResultDisplay({
     : 0
 
   // ── 比較表の税率注 ────────────────────────────────────
-  const bizTaxNote = `個人：税率${(input.industryTaxRate * 100).toFixed(0)}%・事業主控除290万円 ／ 法人：15%（〜800万）/ 23.2%（超過）＋地方税`
+  // 所得税：実効税率・限界税率
+  const indMarginal = getMarginalRate(individual.taxableIncome)
+  const indEffective = individual.taxableIncome > 0
+    ? Math.round(individual.incomeTax / individual.taxableIncome * 1000) / 10
+    : 0
+  const corpMarginal = getMarginalRate(corporation.director.taxableIncome)
+  const corpEffective = corporation.director.taxableIncome > 0
+    ? Math.round(corporation.director.incomeTax / corporation.director.taxableIncome * 1000) / 10
+    : 0
 
   return (
     <div className="space-y-5">
@@ -140,11 +180,11 @@ export default function ResultDisplay({
                 const gap       = Math.max(0, targetBI - currentBI)
                 return (
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span>現在の事業所得：<span className="font-semibold">{(currentBI / 10_000).toLocaleString()}万円</span></span>
+                    <span>現在の事業所得：約<span className="font-semibold">{Math.round(currentBI / 10_000).toLocaleString()}万円</span></span>
                     <span className="text-blue-400">→</span>
                     <span>
-                      目標：<span className="font-semibold">約{(targetBI / 10_000).toLocaleString()}万円</span>
-                      {gap > 0 && <span className="ml-1 text-blue-500">（あと約{(gap / 10_000).toLocaleString()}万円）</span>}
+                      目標：約<span className="font-semibold">{Math.round(targetBI / 10_000).toLocaleString()}万円</span>
+                      {gap > 0 && <span className="ml-1 text-blue-500">（あと約{Math.round(gap / 10_000).toLocaleString()}万円）</span>}
                     </span>
                   </div>
                 )
@@ -324,31 +364,40 @@ export default function ResultDisplay({
                 label="所得税（復興税込）"
                 individual={individual.incomeTax}
                 corporation={corporation.director.incomeTax}
-                note="累進課税5〜45%（復興特別所得税2.1%込み）"
+                note={{
+                  ind:  `実効${indEffective}%・最高税率${indMarginal}%（課税所得 約${Math.round(individual.taxableIncome / 10_000)}万円）`,
+                  corp: `実効${corpEffective}%・最高税率${corpMarginal}%（課税所得 約${Math.round(corporation.director.taxableIncome / 10_000)}万円）`,
+                }}
               />
               <Row
                 label="住民税"
                 individual={individual.residentTax}
                 corporation={corporation.director.residentTax}
-                note="所得割10% ＋ 均等割5,000円"
+                note={{ ind: '所得割10% ＋ 均等割5,000円', corp: '所得割10% ＋ 均等割5,000円' }}
               />
               <Row
                 label="個人事業税 / 法人税等"
                 individual={individual.businessTax}
                 corporation={corporation.corporate.total}
-                note={bizTaxNote}
+                note={{
+                  ind:  `税率${(input.industryTaxRate * 100).toFixed(0)}%（事業主控除290万円）`,
+                  corp: '15%（〜800万円）/ 23.2%（超過分）＋地方法人税・住民税・事業税',
+                }}
               />
               <Row
                 label="国保・年金 / 社会保険（本人）"
                 individual={individual.socialInsurance}
                 corporation={corporation.director.socialInsurance}
-                note="個人：国保（全国平均）＋国民年金16,980円/月 ／ 法人：健保4.99%＋厚年9.15%（折半）"
+                note={{
+                  ind:  '国保（全国平均ベース）＋国民年金 16,980円/月',
+                  corp: '健保 4.99% ＋ 厚年 9.15%（本人負担・折半）',
+                }}
               />
               <Row
                 label="社会保険（会社負担）"
                 individual={0}
                 corporation={corporation.socialInsuranceEmployer}
-                note="健保4.99%＋厚年9.15%＋児童拠出金0.36%（協会けんぽ東京2024年度）"
+                note={{ corp: '健保 4.99% ＋ 厚年 9.15% ＋ 児童拠出金 0.36%（協会けんぽ東京2024年度）' }}
               />
               {corporation.spouseDirector && (
                 <Row
