@@ -69,6 +69,7 @@ export default function ResultDisplay({
   const SLIDER_MAX = 15_000_000
   const SLIDER_STEP = 100_000
   const [sliderSalary, setSliderSalary] = useState(input.directorSalary)
+  const [sliderOpen, setSliderOpen] = useState(false)
 
   const sliderResult = useMemo(
     () => compare({ ...input, directorSalary: sliderSalary }),
@@ -145,8 +146,8 @@ export default function ResultDisplay({
   return (
     <div className="space-y-5">
 
-      {/* 判定バナー */}
-      <div className={`rounded-xl border p-5 ${verdictConfig.bg}`}>
+      {/* 判定バナー（追加コスト・消費税免税を内包） */}
+      <div className={`rounded-xl border p-5 space-y-4 ${verdictConfig.bg}`}>
         <div className="flex items-start gap-3">
           <span className="text-2xl">{verdictConfig.icon}</span>
           <div>
@@ -154,113 +155,113 @@ export default function ResultDisplay({
             <p className="text-sm text-gray-600 mt-1">{verdictConfig.desc}</p>
           </div>
         </div>
+
+        {/* 追加コスト（incorporate / consider のみ） */}
+        {(verdict === 'incorporate' || verdict === 'consider') && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 space-y-2">
+            <p className="font-semibold text-sm">⚠️ 試算に含まれていない追加コスト</p>
+            <table className="w-full">
+              <tbody className="divide-y divide-amber-100">
+                <tr>
+                  <td className="py-1.5 text-amber-700">税理士・顧問費用</td>
+                  <td className="py-1.5 text-right font-medium text-amber-900">年 200,000〜400,000円</td>
+                </tr>
+                <tr>
+                  <td className="py-1.5 text-amber-700">会計ソフト（freee / MFクラウド等）</td>
+                  <td className="py-1.5 text-right font-medium text-amber-900">年 35,000〜40,000円</td>
+                </tr>
+                <tr>
+                  <td className="py-1.5 text-amber-700">合同会社設立費用（一度のみ）</td>
+                  <td className="py-1.5 text-right font-medium text-amber-900">約 60,000円</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr className="border-t border-amber-300">
+                  <td className="pt-2 font-semibold text-amber-900">年間追加コスト目安</td>
+                  <td className="pt-2 text-right font-bold text-amber-900">年 235,000〜440,000円</td>
+                </tr>
+              </tfoot>
+            </table>
+            <p className="text-amber-600">法人住民税均等割（年7万円・赤字でも発生）は上記試算に含まれています。</p>
+          </div>
+        )}
+
+        {/* 消費税免税メリット（incorporate / consider のみ） */}
+        {(verdict === 'incorporate' || verdict === 'consider') && (
+          <div className="bg-teal-50 border border-teal-200 rounded-xl p-3 text-xs text-teal-800 space-y-2">
+            <p className="font-semibold text-sm">🏦 消費税免税の特例メリット（設立後2年間）</p>
+            <p className="text-teal-700">新設法人は資本金1,000万円未満であれば、原則として設立後2年間は消費税が免税になります。</p>
+            {vatPerYear > 0 ? (
+              <div className="bg-white rounded-lg p-3 space-y-1">
+                <p>現在の売上規模（{(input.revenue / 10_000).toLocaleString()}万円）では、個人事業主として消費税を納付している可能性があります。</p>
+                <div className="flex justify-between items-center pt-1 border-t border-teal-100">
+                  <span className="font-medium text-teal-900">2年間の消費税節税効果の目安</span>
+                  <span className="font-bold text-teal-900 text-sm">約 {Math.round(vatPerYear * 2 / 10_000).toLocaleString()}万円</span>
+                </div>
+                <p className="text-teal-500 text-[11px]">※売上・仕入の消費税率10%（税込）を前提とした概算。インボイス登録済みの場合や、主な取引先が消費者でない場合は効果が異なります。</p>
+              </div>
+            ) : (
+              <p className="text-teal-700">現在の売上（{(input.revenue / 10_000).toLocaleString()}万円）では個人事業主としても消費税免税の可能性があります。法人化後も同様に2年間の免税特例が適用されます。</p>
+            )}
+          </div>
+        )}
+
+        {/* 今できる節税対策（not_yet のみ） */}
+        {verdict === 'not_yet' && (() => {
+          const tips: { icon: string; title: string; desc: string }[] = []
+          if (input.blueFormDeduction < 650_000) {
+            tips.push({ icon: '📒', title: '青色申告65万円控除を活用する', desc: '電子申告（e-Tax）＋複式簿記で最大65万円の特別控除が受けられます。現在の設定より節税額が増える可能性があります。' })
+          }
+          if (input.ideco === 0) {
+            tips.push({ icon: '💰', title: 'iDeCo・小規模企業共済を活用する', desc: '個人事業主はiDeCo（最大年816,000円）＋小規模企業共済（最大年840,000円）を全額所得控除できます。合わせると最大年間約165万円の控除に。' })
+          } else {
+            tips.push({ icon: '🏦', title: '小規模企業共済を活用する', desc: '掛金最大月7万円（年840,000円）が全額所得控除。廃業・退職時には退職金としても受け取れます。' })
+          }
+          if (input.familyWorkerSalary === 0 && input.hasSpouse) {
+            tips.push({ icon: '👥', title: '配偶者への専従者給与を活用する', desc: '青色申告の専従者給与を設定すると、給与全額が経費になります（配偶者控除との併用は不可）。配偶者が実際に事業に従事している場合は検討を。' })
+          }
+          return (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
+              <p className="font-semibold text-sm text-blue-900">💡 今すぐできる節税対策</p>
+              <ul className="space-y-3">
+                {tips.map((tip, i) => (
+                  <li key={i} className="flex gap-2 text-sm">
+                    <span className="text-lg leading-tight">{tip.icon}</span>
+                    <div>
+                      <p className="font-medium text-blue-900">{tip.title}</p>
+                      <p className="text-xs text-blue-700 mt-0.5">{tip.desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="border-t border-blue-200 pt-3 text-xs text-blue-700 space-y-1">
+                <p className="font-semibold">法人化が有利になる目安</p>
+                {result.tippingPointBusinessIncome != null ? (() => {
+                  const currentBI = result.individual.businessIncome
+                  const targetBI  = result.tippingPointBusinessIncome!
+                  const gap       = Math.max(0, targetBI - currentBI)
+                  return (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span>現在の事業所得：約<span className="font-semibold">{Math.round(currentBI / 10_000).toLocaleString()}万円</span></span>
+                      <span className="text-blue-400">→</span>
+                      <span>
+                        目標：約<span className="font-semibold">{Math.round(targetBI / 10_000).toLocaleString()}万円</span>
+                        {gap > 0 && <span className="ml-1 text-blue-500">（あと約{Math.round(gap / 10_000).toLocaleString()}万円）</span>}
+                      </span>
+                    </div>
+                  )
+                })() : (
+                  <p>現在の役員報酬設定では、売上が大幅に増えても法人化のメリットが出にくい可能性があります。役員報酬額を見直してから再シミュレーションしてみましょう。</p>
+                )}
+              </div>
+            </div>
+          )
+        })()}
       </div>
 
-      {/* 今できる節税対策（not_yet のみ） */}
-      {verdict === 'not_yet' && (() => {
-        const tips: { icon: string; title: string; desc: string }[] = []
-        if (input.blueFormDeduction < 650_000) {
-          tips.push({ icon: '📒', title: '青色申告65万円控除を活用する', desc: '電子申告（e-Tax）＋複式簿記で最大65万円の特別控除が受けられます。現在の設定より節税額が増える可能性があります。' })
-        }
-        if (input.ideco === 0) {
-          tips.push({ icon: '💰', title: 'iDeCo・小規模企業共済を活用する', desc: '個人事業主はiDeCo（最大年816,000円）＋小規模企業共済（最大年840,000円）を全額所得控除できます。合わせると最大年間約165万円の控除に。' })
-        } else {
-          tips.push({ icon: '🏦', title: '小規模企業共済を活用する', desc: '掛金最大月7万円（年840,000円）が全額所得控除。廃業・退職時には退職金としても受け取れます。' })
-        }
-        if (input.familyWorkerSalary === 0 && input.hasSpouse) {
-          tips.push({ icon: '👥', title: '配偶者への専従者給与を活用する', desc: '青色申告の専従者給与を設定すると、給与全額が経費になります（配偶者控除との併用は不可）。配偶者が実際に事業に従事している場合は検討を。' })
-        }
-        return (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
-            <p className="font-semibold text-sm text-blue-900">💡 今すぐできる節税対策</p>
-            <ul className="space-y-3">
-              {tips.map((tip, i) => (
-                <li key={i} className="flex gap-2 text-sm">
-                  <span className="text-lg leading-tight">{tip.icon}</span>
-                  <div>
-                    <p className="font-medium text-blue-900">{tip.title}</p>
-                    <p className="text-xs text-blue-700 mt-0.5">{tip.desc}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="border-t border-blue-200 pt-3 text-xs text-blue-700 space-y-1">
-              <p className="font-semibold">法人化が有利になる目安</p>
-              {result.tippingPointBusinessIncome != null ? (() => {
-                const currentBI = result.individual.businessIncome
-                const targetBI  = result.tippingPointBusinessIncome!
-                const gap       = Math.max(0, targetBI - currentBI)
-                return (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span>現在の事業所得：約<span className="font-semibold">{Math.round(currentBI / 10_000).toLocaleString()}万円</span></span>
-                    <span className="text-blue-400">→</span>
-                    <span>
-                      目標：約<span className="font-semibold">{Math.round(targetBI / 10_000).toLocaleString()}万円</span>
-                      {gap > 0 && <span className="ml-1 text-blue-500">（あと約{Math.round(gap / 10_000).toLocaleString()}万円）</span>}
-                    </span>
-                  </div>
-                )
-              })() : (
-                <p>現在の役員報酬設定では、売上が大幅に増えても法人化のメリットが出にくい可能性があります。役員報酬額を見直してから再シミュレーションしてみましょう。</p>
-              )}
-            </div>
-          </div>
-        )
-      })()}
-
-      {/* 追加コスト（incorporate / consider のみ） */}
-      {(verdict === 'incorporate' || verdict === 'consider') && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-800 space-y-2">
-          <p className="font-semibold text-sm">⚠️ 試算に含まれていない追加コスト</p>
-          <table className="w-full">
-            <tbody className="divide-y divide-amber-100">
-              <tr>
-                <td className="py-1.5 text-amber-700">税理士・顧問費用</td>
-                <td className="py-1.5 text-right font-medium text-amber-900">年 200,000〜400,000円</td>
-              </tr>
-              <tr>
-                <td className="py-1.5 text-amber-700">会計ソフト（freee / MFクラウド等）</td>
-                <td className="py-1.5 text-right font-medium text-amber-900">年 35,000〜40,000円</td>
-              </tr>
-              <tr>
-                <td className="py-1.5 text-amber-700">合同会社設立費用（一度のみ）</td>
-                <td className="py-1.5 text-right font-medium text-amber-900">約 60,000円</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr className="border-t border-amber-300">
-                <td className="pt-2 font-semibold text-amber-900">年間追加コスト目安</td>
-                <td className="pt-2 text-right font-bold text-amber-900">年 235,000〜440,000円</td>
-              </tr>
-            </tfoot>
-          </table>
-          <p className="text-amber-600">法人住民税均等割（年7万円・赤字でも発生）は上記試算に含まれています。</p>
-        </div>
-      )}
-
-      {/* 消費税免税メリット（incorporate / consider のみ） */}
-      {(verdict === 'incorporate' || verdict === 'consider') && (
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 text-xs text-teal-800 space-y-2">
-          <p className="font-semibold text-sm">🏦 消費税免税の特例メリット（設立後2年間）</p>
-          <p className="text-teal-700">新設法人は資本金1,000万円未満であれば、原則として設立後2年間は消費税が免税になります。</p>
-          {vatPerYear > 0 ? (
-            <div className="bg-white rounded-lg p-3 space-y-1">
-              <p>現在の売上規模（{(input.revenue / 10_000).toLocaleString()}万円）では、個人事業主として消費税を納付している可能性があります。</p>
-              <div className="flex justify-between items-center pt-1 border-t border-teal-100">
-                <span className="font-medium text-teal-900">2年間の消費税節税効果の目安</span>
-                <span className="font-bold text-teal-900 text-sm">約 {(vatPerYear * 2 / 10_000).toLocaleString()}万円</span>
-              </div>
-              <p className="text-teal-500 text-[11px]">※売上・仕入の消費税率10%（税込）を前提とした概算。インボイス登録済みの場合や、主な取引先が消費者でない場合は効果が異なります。</p>
-            </div>
-          ) : (
-            <p className="text-teal-700">現在の売上（{(input.revenue / 10_000).toLocaleString()}万円）では個人事業主としても消費税免税の可能性があります。法人化後も同様に2年間の免税特例が適用されます。</p>
-          )}
-        </div>
-      )}
-
-      {/* バーチャート */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h3 className="font-semibold text-gray-800 mb-4">税金・社会保険料の比較</h3>
+      {/* バーチャート＋スライダー */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+        <h3 className="font-semibold text-gray-800">税金・社会保険料の比較</h3>
         <div className="space-y-4">
           <div>
             <div className="flex justify-between text-sm mb-1">
@@ -281,67 +282,77 @@ export default function ResultDisplay({
             </div>
           </div>
         </div>
-        <div className={`mt-4 text-center text-sm font-semibold ${savings >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+        <div className={`text-center text-sm font-semibold ${savings >= 0 ? 'text-green-600' : 'text-red-500'}`}>
           {savings >= 0 ? `年間 ${yen(savings)} の節税効果` : `法人化でコスト ${yen(Math.abs(savings))} 増加`}
         </div>
-      </div>
 
-      {/* 役員報酬スライダー（サブ） */}
-      <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
-        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">🔧 役員報酬でシミュレーション</p>
-        <div>
-          <div className="flex justify-between items-baseline mb-2">
-            <span className="font-bold text-gray-900">
-              ¥{sliderSalary.toLocaleString()}<span className="text-sm font-normal text-gray-400">/年</span>
-            </span>
-            <span className="text-xs text-gray-400">月額 ¥{sliderMonthly.toLocaleString()}</span>
-          </div>
-          <input
-            type="range" min={0} max={SLIDER_MAX} step={SLIDER_STEP} value={sliderSalary}
-            onChange={(e) => setSliderSalary(Number(e.target.value))}
-            className="w-full h-2 accent-blue-500 cursor-pointer"
-          />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>¥0</span><span>¥{(SLIDER_MAX / 10_000).toLocaleString()}万</span>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-400">個人事業主</span>
-              <span className="text-gray-600 font-medium">{yen(sliderIndTotal)}</span>
-            </div>
-            <div className="h-4 bg-gray-200 rounded overflow-hidden">
-              <div className="h-full bg-orange-200 rounded transition-all duration-300" style={{ width: `${sliderIndWidth}%` }} />
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-400">法人化（この報酬）</span>
-              <span className="text-gray-600 font-medium">{yen(sliderCorpTotal)}</span>
-            </div>
-            <div className="h-4 bg-gray-200 rounded overflow-hidden">
-              <div className="h-full bg-blue-200 rounded transition-all duration-300" style={{ width: `${sliderCorpWidth}%` }} />
-            </div>
-          </div>
-        </div>
-
-        <div className={`text-center text-xs font-semibold py-1.5 rounded-lg ${sliderSavings >= 500_000 ? 'bg-green-50 text-green-700' : sliderSavings >= 0 ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-600'}`}>
-          {sliderSavings >= 0 ? `年間 ${yen(sliderSavings)} の節税効果` : `法人化でコスト ${yen(Math.abs(sliderSavings))} 増加`}
-          {sliderSalary !== input.directorSalary && (
-            <span className="ml-1.5 font-normal opacity-70">
-              （元の設定より {sliderSavings - savings >= 0 ? '+' : ''}{yen(sliderSavings - savings)}）
-            </span>
-          )}
-        </div>
-
-        {sliderSalary !== input.directorSalary && (
-          <button type="button" onClick={() => setSliderSalary(input.directorSalary)}
-            className="text-xs text-blue-500 hover:underline block">
-            ← 元の設定（¥{input.directorSalary.toLocaleString()}/年）に戻す
+        {/* 役員報酬スライダー（折りたたみ） */}
+        <div className="border-t border-gray-100">
+          <button
+            type="button"
+            onClick={() => setSliderOpen(v => !v)}
+            className="w-full flex items-center justify-between pt-3 text-left"
+          >
+            <span className="text-xs font-medium text-gray-400">🔧 役員報酬でシミュレーション</span>
+            <span className={`text-gray-300 text-xs transition-transform duration-200 ${sliderOpen ? 'rotate-180' : ''}`}>▼</span>
           </button>
-        )}
+          {sliderOpen && <div className="pt-3 space-y-3">
+            <div>
+              <div className="flex justify-between items-baseline mb-2">
+                <span className="font-bold text-gray-900">
+                  ¥{sliderSalary.toLocaleString()}<span className="text-sm font-normal text-gray-400">/年</span>
+                </span>
+                <span className="text-xs text-gray-400">月額 ¥{sliderMonthly.toLocaleString()}</span>
+              </div>
+              <input
+                type="range" min={0} max={SLIDER_MAX} step={SLIDER_STEP} value={sliderSalary}
+                onChange={(e) => setSliderSalary(Number(e.target.value))}
+                className="w-full h-2 accent-blue-500 cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>¥0</span><span>¥{(SLIDER_MAX / 10_000).toLocaleString()}万</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-gray-400">個人事業主</span>
+                  <span className="text-gray-600 font-medium">{yen(sliderIndTotal)}</span>
+                </div>
+                <div className="h-4 bg-gray-200 rounded overflow-hidden">
+                  <div className="h-full bg-orange-200 rounded transition-all duration-300" style={{ width: `${sliderIndWidth}%` }} />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-gray-400">法人化（この報酬）</span>
+                  <span className="text-gray-600 font-medium">{yen(sliderCorpTotal)}</span>
+                </div>
+                <div className="h-4 bg-gray-200 rounded overflow-hidden">
+                  <div className="h-full bg-blue-200 rounded transition-all duration-300" style={{ width: `${sliderCorpWidth}%` }} />
+                </div>
+              </div>
+            </div>
+            <div className={`text-center text-xs font-semibold py-1.5 rounded-lg ${sliderSavings >= 500_000 ? 'bg-green-50 text-green-700' : sliderSavings >= 0 ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-600'}`}>
+              {sliderSavings >= 0 ? `年間 ${yen(sliderSavings)} の節税効果` : `法人化でコスト ${yen(Math.abs(sliderSavings))} 増加`}
+              {sliderSalary !== input.directorSalary && (() => {
+                const diff = sliderSavings - savings
+                if (diff === 0) return null
+                return (
+                  <span className="ml-1.5 font-normal opacity-70">
+                    （元の設定より {yen(Math.abs(diff))} {diff > 0 ? '有利' : '不利'}）
+                  </span>
+                )
+              })()}
+            </div>
+            {sliderSalary !== input.directorSalary && (
+              <button type="button" onClick={() => setSliderSalary(input.directorSalary)}
+                className="text-xs text-blue-500 hover:underline block">
+                ← 元の設定（¥{input.directorSalary.toLocaleString()}/年）に戻す
+              </button>
+            )}
+          </div>}
+        </div>
       </div>
 
       {/* 詳細内訳テーブル */}
@@ -374,7 +385,7 @@ export default function ResultDisplay({
                 individual={individual.incomeTax}
                 corporation={corporation.director.incomeTax}
                 note={{
-                  ind:  `実効${indEffective}%・最高税率${indMarginal}%（課税所得 約${Math.round(individual.taxableIncome / 10_000)}万円）`,
+                  ind:  `実質${indEffective}%・最高税率${indMarginal}%（課税所得 約${Math.round(individual.taxableIncome / 10_000)}万円）`,
                   corp: `実効${corpEffective}%・最高税率${corpMarginal}%（課税所得 約${Math.round(corporation.director.taxableIncome / 10_000)}万円）`,
                 }}
               />
@@ -383,7 +394,7 @@ export default function ResultDisplay({
                 individual={individual.residentTax}
                 corporation={corporation.director.residentTax}
                 note={{
-                  ind:  `所得割10% ＋ 均等割5,000円（事業所得に対する実効${indResEff}%）`,
+                  ind:  `所得割10% ＋ 均等割5,000円（事業所得に対する実質${indResEff}%）`,
                   corp: `所得割10% ＋ 均等割5,000円（役員報酬に対する実効${corpResEff}%）`,
                 }}
               />
@@ -392,7 +403,7 @@ export default function ResultDisplay({
                 individual={individual.businessTax}
                 corporation={corporation.corporate.total}
                 note={{
-                  ind:  `税率${(input.industryTaxRate * 100).toFixed(0)}%（事業主控除290万円）→ 事業所得に対する実効${indBizEff}%`,
+                  ind:  `税率${(input.industryTaxRate * 100).toFixed(0)}%（事業主控除290万円）→ 事業所得に対する実質${indBizEff}%`,
                   corp: `15%（〜800万円）/ 23.2%（超過分）＋地方税 → 法人課税所得に対する実効${corpTaxEff}%`,
                 }}
               />
@@ -401,7 +412,7 @@ export default function ResultDisplay({
                 individual={individual.socialInsurance}
                 corporation={corporation.director.socialInsurance}
                 note={{
-                  ind:  `国保（全国平均）＋国民年金16,980円/月 → 事業所得に対する実効${nhiEff}%`,
+                  ind:  `国保（全国平均）＋国民年金16,980円/月 → 事業所得に対する実質${nhiEff}%`,
                   corp: `健保4.99%＋厚年9.15%（折半）→ 役員報酬に対する実効${corpSocEff}%`,
                 }}
               />

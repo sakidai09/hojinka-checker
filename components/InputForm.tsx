@@ -7,7 +7,7 @@ import { InputData } from '@/lib/types'
 function Tooltip({ text }: { text: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <span className="relative inline-block align-middle ml-1">
+    <span className="relative inline-block ml-1">
       <button
         type="button"
         onMouseEnter={() => setOpen(true)}
@@ -82,7 +82,7 @@ function MoneyInput({
   }
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
         {label}
         {hint && <Tooltip text={hint} />}
       </label>
@@ -112,7 +112,7 @@ function DirectorSalaryInput({ value, onChange }: { value: number; onChange: (v:
   const monthly = value > 0 ? Math.round(value / 12) : null
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
         希望する役員報酬（<span className="font-bold text-gray-900">年額</span>）
         <Tooltip text="法人化後に代表者として受け取る年間給与。役員報酬は法人の経費になり、受け取る側には給与所得控除も適用されます。なお、一度決定した役員報酬は原則として期中に変更できません（年1回の改定のみ）。" />
       </label>
@@ -307,7 +307,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           hint="収支内訳書・青色申告決算書の「経費合計」欄の金額。専従者給与は別の欄に入力するのでここには含めないでください。"
         />
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
             青色申告特別控除
             <Tooltip text="青色申告者が受けられる特別控除。e-Tax+複式簿記で65万円、複式簿記のみで55万円、簡易帳簿で10万円、白色申告は0円。確定申告書の「青色申告特別控除額」欄で確認できます。" />
           </label>
@@ -324,7 +324,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           hint="青色申告の専従者給与として支払った年間総額。事業に従事する家族への給与で、全額が経費になります。いない場合は0のままでOK。"
         />
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
             業種（個人事業税率）
             <Tooltip text="都道府県に納める個人事業税の税率。ITエンジニア・コンサルタント等の一般的なサービス業は5%。農林水産業の一部は低税率。課税されない業種もあります（不動産貸付などは要確認）。" />
           </label>
@@ -342,7 +342,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
       <Section title="👨‍👩‍👧 家族構成・所得控除">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-700">
+            <p className="flex items-center text-sm font-medium text-gray-700">
               配偶者あり
               <Tooltip text="配偶者（妻・夫）の年間所得が48万円以下の場合に38万円の配偶者控除が受けられます。配偶者控除と専従者給与は同時に使えないため、どちらが有利か検討が必要です。" />
             </p>
@@ -354,7 +354,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           </button>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
             扶養家族の数（配偶者除く）
             <Tooltip text="配偶者以外の扶養親族（子ども・親など）の人数。1人につき38万円の控除（16歳未満の子どもは扶養控除の対象外ですが、入力しても計算上影響ありません）。" />
           </label>
@@ -370,7 +370,7 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
           hint="iDeCo（最大年816,000円）や小規模企業共済（最大年840,000円）の年間掛金合計。全額が所得控除になります。未加入の場合は0のままでOK。"
         />
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
             年齢
             <Tooltip text="40歳以上になると国民健康保険料に介護保険料が加算されます（年間1〜3万円程度）。40歳未満・75歳以上では介護保険料は不要です。" />
           </label>
