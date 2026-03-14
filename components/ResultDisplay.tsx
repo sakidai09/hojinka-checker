@@ -109,6 +109,9 @@ export default function ResultDisplay({
   // ── スライダー計算 ────────────────────────────────────
   const sliderIndTotal = sliderResult.individual.total
   const sliderCorpTotal = sliderResult.corporation.totalBurden
+  const sliderMaxVal = Math.max(sliderIndTotal, sliderCorpTotal)
+  const sliderIndWidth = Math.round((sliderIndTotal / sliderMaxVal) * 100)
+  const sliderCorpWidth = Math.round((sliderCorpTotal / sliderMaxVal) * 100)
 
   // ── 消費税免税メリット ────────────────────────────────
   const vatPerYear = input.revenue > 10_000_000
@@ -303,14 +306,24 @@ export default function ResultDisplay({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <div className="bg-white rounded-lg p-2.5 text-center border border-gray-100">
-            <p className="text-xs text-gray-400 mb-0.5">個人事業主</p>
-            <p className="text-sm font-semibold text-gray-800">{yen(sliderIndTotal)}</p>
+        <div className="space-y-2">
+          <div>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-gray-400">個人事業主</span>
+              <span className="text-gray-600 font-medium">{yen(sliderIndTotal)}</span>
+            </div>
+            <div className="h-4 bg-gray-200 rounded overflow-hidden">
+              <div className="h-full bg-orange-200 rounded transition-all duration-300" style={{ width: `${sliderIndWidth}%` }} />
+            </div>
           </div>
-          <div className="bg-white rounded-lg p-2.5 text-center border border-gray-100">
-            <p className="text-xs text-gray-400 mb-0.5">法人化（この報酬）</p>
-            <p className="text-sm font-semibold text-gray-800">{yen(sliderCorpTotal)}</p>
+          <div>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-gray-400">法人化（この報酬）</span>
+              <span className="text-gray-600 font-medium">{yen(sliderCorpTotal)}</span>
+            </div>
+            <div className="h-4 bg-gray-200 rounded overflow-hidden">
+              <div className="h-full bg-blue-200 rounded transition-all duration-300" style={{ width: `${sliderCorpWidth}%` }} />
+            </div>
           </div>
         </div>
 
