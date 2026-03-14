@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import InputForm from '@/components/InputForm'
 import ResultDisplay from '@/components/ResultDisplay'
 import { InputData } from '@/lib/types'
@@ -59,7 +60,9 @@ export default function Home() {
 
   // マウント時: localStorage から復元 & ランダムサブタイトル
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInput(loadInput())
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSubtitle(SUBTITLES[Math.floor(Math.random() * SUBTITLES.length)])
   }, [])
 
@@ -95,9 +98,14 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="max-w-lg mx-auto px-4 pb-8 text-center text-xs text-gray-400">
-        本ツールの計算結果はあくまで参考値です。<br />正確な税額・社会保険料は税理士・社労士にご相談ください。
-        <p className="mt-2 text-gray-300">v{process.env.NEXT_PUBLIC_APP_VERSION}</p>
+      <footer className="max-w-lg mx-auto px-4 pb-8 space-y-4 text-center text-xs text-gray-400">
+        <p>本ツールの計算結果はあくまで参考値です。<br />正確な税額・社会保険料は税理士・社労士にご相談ください。</p>
+        <div className="flex justify-center items-center gap-4 text-gray-400">
+          <Link href="/privacy" className="hover:text-gray-600 transition-colors">
+            プライバシーポリシー
+          </Link>
+          <span>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+        </div>
       </footer>
     </div>
   )
