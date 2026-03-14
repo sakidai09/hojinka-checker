@@ -287,14 +287,17 @@ export default function ResultDisplay({
         </div>
 
         {/* 役員報酬スライダー（折りたたみ） */}
-        <div className="border-t border-gray-100">
+        <div className="border-t border-gray-100 pt-3">
           <button
             type="button"
             onClick={() => setSliderOpen(v => !v)}
-            className="w-full flex items-center justify-between pt-3 text-left"
+            className="w-full flex items-center justify-center gap-3 p-3 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-lg transition-colors"
           >
-            <span className="text-xs font-medium text-gray-400">🔧 役員報酬でシミュレーション</span>
-            <span className={`text-gray-300 text-xs transition-transform duration-200 ${sliderOpen ? 'rotate-180' : ''}`}>▼</span>
+            <div className="flex items-center gap-2">
+              <span className="text-base">🔧</span>
+              <span className="font-semibold text-blue-800">役員報酬でシミュレーション</span>
+            </div>
+            <span className={`text-blue-500 text-sm font-bold transition-transform duration-200 ${sliderOpen ? 'rotate-180' : ''}`}>▼</span>
           </button>
           {sliderOpen && <div className="pt-3 space-y-3">
             <div>
