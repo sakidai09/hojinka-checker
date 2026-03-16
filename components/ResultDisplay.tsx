@@ -70,6 +70,7 @@ export default function ResultDisplay({
   const SLIDER_STEP = 100_000
   const [sliderSalary, setSliderSalary] = useState(input.directorSalary)
   const [sliderOpen, setSliderOpen] = useState(false)
+  const [bannerOpen, setBannerOpen] = useState(false)
 
   const sliderResult = useMemo(
     () => compare({ ...input, directorSalary: sliderSalary }),
@@ -155,6 +156,24 @@ export default function ResultDisplay({
             <p className="text-sm text-gray-600 mt-1">{verdictConfig.desc}</p>
           </div>
         </div>
+
+        {/* サブブロックトグル */}
+        <button
+          type="button"
+          onClick={() => setBannerOpen(v => !v)}
+          className="w-full flex items-center justify-center gap-3 p-3 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-lg transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-base">{verdict === 'not_yet' ? '💡' : '📋'}</span>
+            <span className="font-semibold text-blue-800">
+              {verdict === 'not_yet' ? '節税対策・法人化の目安' : '追加コスト・消費税免税の詳細'}
+            </span>
+          </div>
+          <span className={`text-blue-500 text-sm font-bold transition-transform duration-200 ${bannerOpen ? 'rotate-180' : ''}`}>▼</span>
+        </button>
+
+        {/* サブブロック（折りたたみ） */}
+        {bannerOpen && <div className="space-y-4">
 
         {/* 追加コスト（incorporate / consider のみ） */}
         {(verdict === 'incorporate' || verdict === 'consider') && (
@@ -257,6 +276,7 @@ export default function ResultDisplay({
             </div>
           )
         })()}
+        </div>}
       </div>
 
       {/* バーチャート＋スライダー */}
