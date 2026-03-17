@@ -88,9 +88,11 @@ export default function Home() {
         <div className="max-w-lg mx-auto px-4 py-4">
           <div className="flex items-center gap-2">
             <Image src="/logo.png" alt="法人化シミュレーター ロゴ" width={32} height={32} className="object-contain" priority />
-            <h1 className="text-xl font-bold text-gray-900">法人化シミュレーター</h1>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">法人化シミュレーター</h1>
+              <p className="text-xs text-gray-500">{subtitle}</p>
+            </div>
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>
         </div>
       </header>
 
