@@ -2,8 +2,8 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'お問い合わせ | 法人化シミュレーター',
-  description: '当サイト（法人化シミュレーター）へのお問い合わせについて',
+  title: 'お問い合わせ・運営者情報 | 法人化シミュレーター',
+  description: '法人化シミュレーターへのお問い合わせ方法と運営者情報について。',
 }
 
 export default function Contact() {
@@ -11,7 +11,7 @@ export default function Contact() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">お問い合わせ</h1>
+          <h1 className="text-xl font-bold text-gray-900">お問い合わせ・運営者情報</h1>
           <Link
             href="/"
             className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
@@ -24,18 +24,18 @@ export default function Contact() {
       <main className="max-w-lg mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-8 text-gray-800 text-sm leading-relaxed">
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">お問い合わせフォームについて</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">お問い合わせ</h2>
             <p>
-              当サイトについてのご質問、ご意見、バグ報告などがございましたら、以下のGoogleフォームよりお問い合わせください。
+              当サイトについてのご質問、ご意見、不具合のご報告などがございましたら、下記メールアドレスまでお気軽にお問い合わせください。
             </p>
-            <div className="mt-6 text-center">
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p className="font-bold text-gray-900 mb-1">メールアドレス</p>
+              {/* TODO: 実際のメールアドレスに差し替えてください */}
               <a
-                href="https://forms.gle/XXXXXXX" // FIXME: 実際のフォームURLに差し替えてください
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-sm"
+                href="mailto:support@hojinka-checker.com"
+                className="text-blue-600 hover:underline"
               >
-                お問い合わせフォームを開く
+                support@hojinka-checker.com
               </a>
             </div>
             <p className="mt-4 text-xs text-gray-500">
@@ -45,9 +45,44 @@ export default function Contact() {
 
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">運営者情報</h2>
-            <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-              <li>運営者: 法人化シミュレーター運営チーム</li>
-            </ul>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <tbody className="divide-y divide-gray-200">
+                  <tr>
+                    <th className="py-3 pr-4 text-left font-bold text-gray-700 whitespace-nowrap align-top w-28">サイト名</th>
+                    <td className="py-3 text-gray-800">法人化シミュレーター</td>
+                  </tr>
+                  <tr>
+                    <th className="py-3 pr-4 text-left font-bold text-gray-700 whitespace-nowrap align-top">サイトURL</th>
+                    <td className="py-3 text-gray-800">
+                      <a href="https://hojinka-checker.com" className="text-blue-600 hover:underline">
+                        https://hojinka-checker.com
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="py-3 pr-4 text-left font-bold text-gray-700 whitespace-nowrap align-top">運営者</th>
+                    <td className="py-3 text-gray-800">合同会社GILOS</td>
+                  </tr>
+                  <tr>
+                    <th className="py-3 pr-4 text-left font-bold text-gray-700 whitespace-nowrap align-top">お問い合わせ</th>
+                    <td className="py-3 text-gray-800">
+                      <a href="mailto:support@hojinka-checker.com" className="text-blue-600 hover:underline">
+                        support@hojinka-checker.com
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="py-3 pr-4 text-left font-bold text-gray-700 whitespace-nowrap align-top">サービス内容</th>
+                    <td className="py-3 text-gray-800">個人事業主の法人化に関する税負担シミュレーション（無料）</td>
+                  </tr>
+                  <tr>
+                    <th className="py-3 pr-4 text-left font-bold text-gray-700 whitespace-nowrap align-top">サービス料金</th>
+                    <td className="py-3 text-gray-800">無料</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
         </div>
       </main>

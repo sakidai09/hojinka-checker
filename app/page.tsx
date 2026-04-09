@@ -148,15 +148,51 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="max-w-lg mx-auto px-4 pb-8 space-y-4 text-center text-xs text-gray-400">
+      <footer className="max-w-lg mx-auto px-4 pb-8 space-y-6 text-center text-xs text-gray-400">
+        {/* 関連記事リンク */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 text-left">
+          <h2 className="text-sm font-bold text-gray-900 mb-3">法人化お役立ち記事</h2>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <Link href="/articles/timing" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
+                法人化のベストタイミングとは？判断基準を徹底解説
+              </Link>
+            </li>
+            <li>
+              <Link href="/articles/procedure" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
+                法人化の手続きガイド｜設立までの流れと必要書類
+              </Link>
+            </li>
+            <li>
+              <Link href="/articles/tax-comparison" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
+                個人事業主と法人の税金を徹底比較｜どちらが得？
+              </Link>
+            </li>
+            <li>
+              <Link href="/articles/social-insurance" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
+                個人事業主と法人の社会保険を比較｜国保vs社保の違い
+              </Link>
+            </li>
+            <li>
+              <Link href="/articles/micro-corp" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
+                マイクロ法人とは？個人事業主との二刀流で社会保険料を最適化
+              </Link>
+            </li>
+          </ul>
+        </div>
+
         <p>本ツールの計算結果はあくまで参考値です。<br />正確な税額・社会保険料は税理士・社労士にご相談ください。</p>
-        <div className="flex justify-center items-center gap-4 text-gray-400">
+        <div className="flex flex-wrap justify-center items-center gap-3 text-gray-400">
+          <Link href="/terms" className="hover:text-gray-600 transition-colors">
+            利用規約
+          </Link>
+          <span>|</span>
           <Link href="/privacy" className="hover:text-gray-600 transition-colors">
             プライバシーポリシー
           </Link>
           <span>|</span>
           <Link href="/contact" className="hover:text-gray-600 transition-colors">
-            お問い合わせ
+            お問い合わせ・運営者情報
           </Link>
           <span>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
         </div>
