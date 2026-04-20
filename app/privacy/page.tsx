@@ -41,6 +41,9 @@ export default function PrivacyPolicy() {
               Googleなどの第三者配信事業者は、Cookieを使用して、各ユーザーが当サイトや他のウェブサイトに過去にアクセスした際の情報に基づいて広告を配信します。Googleが広告Cookieを使用することにより、各ユーザーが当サイトや他のウェブサイトにアクセスした際の情報に基づいて、Googleやそのパートナーが適切な広告を表示できるようになります。
             </p>
             <p className="mt-2">
+              広告配信のため、第三者配信事業者や広告ネットワークがユーザーのブラウザにCookieを保存したり、既存のCookieを読み取ったりする場合があります。また、広告配信や不正利用防止、効果測定のために、IPアドレス、ブラウザ情報、端末情報、閲覧ページ、広告の表示・クリックに関する情報などが利用される場合があります。
+            </p>
+            <p className="mt-2">
               ユーザーは、
               <a
                 href="https://myadcenter.google.com/"
@@ -63,16 +66,29 @@ export default function PrivacyPolicy() {
               </a>
               にアクセスして、第三者配信事業者がパーソナライズド広告の掲載に使用するCookieを無効にすることもできます。）
             </p>
+            <p className="mt-2">
+              Googleによる広告でのデータ利用については、
+              <a
+                href="https://policies.google.com/technologies/partner-sites?hl=ja"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline inline-flex items-center mx-1 gap-1"
+              >
+                Googleのポリシーと規約
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </a>
+              をご確認ください。
+            </p>
           </section>
 
           {/* Section: アクセス解析 */}
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">アクセス解析ツールについて</h2>
             <p>
-              当サイトでは、Googleによるアクセス解析ツール「Google Analytics」を利用しています。このGoogle Analyticsはトラフィックデータの収集のためにCookieを使用しています。このトラフィックデータは匿名で収集されており、個人を特定するものではありません。
+              当サイトでは、サービス改善や不具合調査のため、アクセス状況や利用状況を確認する場合があります。アクセス解析ツールを導入する場合、Cookieや匿名のトラフィックデータを利用し、個人を直接特定しない形で分析します。
             </p>
             <p className="mt-2">
-              この機能は、Cookieを無効にすることで収集を拒否することが出来ますので、お使いのブラウザの設定をご確認ください。
+              Cookieを無効にすることで収集を拒否できますので、お使いのブラウザの設定をご確認ください。
             </p>
           </section>
 
@@ -84,6 +100,16 @@ export default function PrivacyPolicy() {
             </p>
             <p className="mt-2">
               当サイトの利用により生じた直接的、間接的、付随的、派生的ないかなる損害についても、当サイトの運営者は一切の責任を負いません。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">プライバシーポリシーの変更</h2>
+            <p>
+              本ポリシーの内容は、法令や利用サービスの変更に応じて、利用者への事前通知なく変更される場合があります。変更後の内容は本ページに掲載した時点で有効となります。
+            </p>
+            <p className="mt-3 text-xs text-gray-500">
+              最終更新日: 2026年4月20日
             </p>
           </section>
         </div>

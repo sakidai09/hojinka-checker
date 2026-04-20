@@ -20,6 +20,12 @@ export default function ProcedureArticle() {
       <main className="max-w-lg mx-auto px-4 py-8">
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6 text-gray-800 text-sm leading-relaxed">
           <h1 className="text-xl font-bold text-gray-900">法人化の手続きガイド｜設立までの流れと必要書類</h1>
+          <p className="text-xs text-gray-500">
+            最終更新日: 2026年4月20日 ／
+            <Link href="/calculation-policy" className="text-blue-600 hover:underline ml-1">
+              シミュレーターの計算根拠
+            </Link>
+          </p>
 
           <p>
             法人化を決意したら、次は実際の手続きです。「何から始めればいい？」「どれくらい費用がかかる？」という疑問に答えるために、法人設立の流れを株式会社・合同会社それぞれのケースで解説します。
@@ -163,6 +169,9 @@ export default function ProcedureArticle() {
               法人設立の手続きは複雑に見えますが、会社設立freeeやマネーフォワード会社設立などのオンラインサービスを使えば、多くの書類作成を自動化できます。まずは
               <Link href="/" className="text-blue-600 hover:underline">法人化シミュレーター</Link>
               で税負担を比較し、法人化のメリットが見込める場合に手続きに進みましょう。
+              試算の前提は
+              <Link href="/calculation-policy" className="text-blue-600 hover:underline">計算根拠ページ</Link>
+              で確認できます。
             </p>
           </section>
         </article>

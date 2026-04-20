@@ -20,6 +20,12 @@ export default function MicroCorpArticle() {
       <main className="max-w-lg mx-auto px-4 py-8">
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6 text-gray-800 text-sm leading-relaxed">
           <h1 className="text-xl font-bold text-gray-900">マイクロ法人とは？個人事業主との二刀流で社会保険料を最適化</h1>
+          <p className="text-xs text-gray-500">
+            最終更新日: 2026年4月20日 ／
+            <Link href="/calculation-policy" className="text-blue-600 hover:underline ml-1">
+              シミュレーターの計算根拠
+            </Link>
+          </p>
 
           <p>
             近年、フリーランスや個人事業主の間で注目されている<strong>「マイクロ法人」</strong>。従業員を雇わず、自分ひとりだけの法人を設立する手法です。特に「個人事業主＋マイクロ法人」の二刀流スキームは、社会保険料の最適化に効果的とされています。
@@ -122,6 +128,9 @@ export default function MicroCorpArticle() {
             <p className="mt-2">
               <Link href="/" className="text-blue-600 hover:underline">法人化シミュレーター</Link>
               で、法人化した場合の社会保険料を含めた総合的な負担額を確認できます。
+              計算に含めている項目は
+              <Link href="/calculation-policy" className="text-blue-600 hover:underline">計算根拠ページ</Link>
+              で確認できます。
             </p>
           </section>
         </article>

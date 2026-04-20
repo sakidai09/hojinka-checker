@@ -20,6 +20,12 @@ export default function TimingArticle() {
       <main className="max-w-lg mx-auto px-4 py-8">
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6 text-gray-800 text-sm leading-relaxed">
           <h1 className="text-xl font-bold text-gray-900">法人化のベストタイミングとは？判断基準を徹底解説</h1>
+          <p className="text-xs text-gray-500">
+            最終更新日: 2026年4月20日 ／
+            <Link href="/calculation-policy" className="text-blue-600 hover:underline ml-1">
+              シミュレーターの計算根拠
+            </Link>
+          </p>
 
           <p>
             個人事業主として事業が順調に成長すると、「そろそろ法人化すべき？」という疑問が生まれます。法人化には大きなメリットがある一方で、コストやリスクも伴います。この記事では、法人化に踏み切るべきタイミングの判断基準を詳しく解説します。
@@ -84,6 +90,9 @@ export default function TimingArticle() {
               法人化のタイミングは、税負担だけでなく、事業の成長段階や将来のビジョンを総合的に考慮して判断することが大切です。まずは当サイトの
               <Link href="/" className="text-blue-600 hover:underline">法人化シミュレーター</Link>
               で、現在の売上・経費に基づく税負担の比較を確認してみましょう。
+              計算に含めている税金や社会保険料の範囲は
+              <Link href="/calculation-policy" className="text-blue-600 hover:underline">計算根拠ページ</Link>
+              で確認できます。
             </p>
           </section>
         </article>

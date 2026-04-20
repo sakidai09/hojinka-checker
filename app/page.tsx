@@ -63,7 +63,6 @@ export default function Home() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setInput(loadInput())
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSubtitle(SUBTITLES[Math.floor(Math.random() * SUBTITLES.length)])
   }, [])
 
@@ -85,7 +84,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-4">
+        <div className="max-w-lg mx-auto px-4 py-4 space-y-3">
           <div className="flex items-center gap-2">
             <Image src="/logo.png" alt="法人化シミュレーター ロゴ" width={32} height={32} className="object-contain" priority />
             <div>
@@ -93,6 +92,17 @@ export default function Home() {
               <p className="text-xs text-gray-500">{subtitle}</p>
             </div>
           </div>
+          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+            <Link href="/calculation-policy" className="hover:text-blue-600 transition-colors">
+              計算根拠
+            </Link>
+            <Link href="/articles/timing" className="hover:text-blue-600 transition-colors">
+              法人化ガイド
+            </Link>
+            <Link href="/about" className="hover:text-blue-600 transition-colors">
+              このサイトについて
+            </Link>
+          </nav>
         </div>
       </header>
 
@@ -103,46 +113,87 @@ export default function Home() {
           <InputForm data={input} onChange={setInput} onSubmit={handleSubmit} />
         )}
 
-        {/* AdSense・SEO対策としてのテキストコンテンツ（有用性の低いコンテンツと判定されるのを防ぐため） */}
         <div className="mt-12 bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-sm text-gray-700 space-y-6 leading-relaxed">
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">法人化シミュレーターとは？</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">このシミュレーターで比較できること</h2>
             <p>
-              個人事業主やフリーランスの方が「法人化（法人成り）」をした場合と、そのまま個人事業主を続けた場合で、所得税・住民税・国民健康保険料（社会保険料）などの税負担がどれくらい変わるかを簡単に比較できるシミュレーションツールです。
-              売上や経費を入力するだけで、手元に残る金額の違いを可視化します。
+              法人化シミュレーターは、個人事業主のまま事業を続けた場合と、法人化して役員報酬を受け取る場合の年間負担額を比較する無料ツールです。
+              所得税だけでなく、住民税、個人事業税、国民健康保険、国民年金、法人税、法人住民税、法人事業税、社会保険の本人負担分と会社負担分まで含めて試算します。
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">法人化のメリット・デメリット</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-bold text-blue-700 mb-1">■ メリット</h3>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>給与所得控除が使えるため、役員報酬を出すことで節税効果が期待できる</li>
-                  <li>欠損金（赤字）の繰越期間が最長10年になる（個人は3年）</li>
-                  <li>社会的な信用度が上がり、取引先拡大や資金調達で有利になることがある</li>
-                  <li>家族を役員にして所得を分散しやすい</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-bold text-red-700 mb-1">■ デメリット</h3>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>赤字でも法人住民税の均等割（年間約7万円〜）がかかる</li>
-                  <li>社会保険への加入が義務化され、会社負担分の保険料が発生する</li>
-                  <li>設立費用（株式会社で約25万円、合同会社で約10万円）がかかる</li>
-                  <li>決算や税務申告が複雑になり、税理士報酬などの維持コストが増える</li>
-                </ul>
-              </div>
+            <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">計算に含めている主な項目</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse">
+                <tbody>
+                  <tr>
+                    <th className="border border-gray-300 bg-gray-50 px-3 py-2 text-left w-28">個人側</th>
+                    <td className="border border-gray-300 px-3 py-2">
+                      事業所得、所得税、住民税、個人事業税、国民健康保険、国民年金、青色申告控除、iDeCo等の所得控除
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="border border-gray-300 bg-gray-50 px-3 py-2 text-left">法人側</th>
+                    <td className="border border-gray-300 px-3 py-2">
+                      役員報酬、給与所得控除、法人課税所得、法人税等、法人住民税均等割、法人事業税、社会保険の本人負担・会社負担
+                    </td>
+                  </tr>
+                  <tr>
+                    <th className="border border-gray-300 bg-gray-50 px-3 py-2 text-left">追加設定</th>
+                    <td className="border border-gray-300 px-3 py-2">
+                      配偶者役員報酬、扶養人数、住宅ローン控除、医療費控除、生命保険料控除、地震保険料控除、寄附金控除
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3">
+              詳しい計算式や前提条件は
+              <Link href="/calculation-policy" className="text-blue-600 hover:underline mx-1">
+                計算根拠と前提条件
+              </Link>
+              にまとめています。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">ケース別に見る確認ポイント</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border border-gray-300 px-3 py-2 text-left">ケース</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left">入力例</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left">見るべき点</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-gray-300 px-3 py-2 font-medium">IT・デザイン系</td>
+                    <td className="border border-gray-300 px-3 py-2">売上700万円、経費80万円</td>
+                    <td className="border border-gray-300 px-3 py-2">所得税率と国保負担が上がり始めるため、役員報酬の設定で差が出ます。</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 px-3 py-2 font-medium">コンサル・士業</td>
+                    <td className="border border-gray-300 px-3 py-2">売上1,000万円、経費150万円</td>
+                    <td className="border border-gray-300 px-3 py-2">法人税と給与所得控除の効果、社会保険の会社負担を合わせて確認します。</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 px-3 py-2 font-medium">店舗・飲食</td>
+                    <td className="border border-gray-300 px-3 py-2">売上1,200万円、経費700万円</td>
+                    <td className="border border-gray-300 px-3 py-2">売上だけでなく利益率が重要です。法人住民税や維持費も含めて判断します。</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">法人化の目安はいつ？</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">結果を見るときの注意点</h2>
             <p>
-              一般的に、個人事業主の課税所得（売上から経費や各種控除を引いた金額）が<strong>500万円〜800万円</strong>を超えたあたりが法人化を検討するタイミングと言われています。
-              日本の所得税は累進課税のため、所得が増えるほど税率が高くなりますが、法人税は一定の税率（中小企業の場合は軽減税率あり）となるため、ある水準を超えると法人化のほうが税負担が軽くなります。
-              ただし、社会保険料の負担額を含めると状況は大きく変わるため、本シミュレーターで具体的な数字を比較してみることをおすすめします。
+              法人化の損得は、売上だけでは判断できません。経費率、役員報酬、家族構成、国民健康保険料の地域差、消費税やインボイス登録の状況、税理士報酬などによって結果が変わります。
+              本ツールは判断の入り口として使い、実際に法人を設立する前には専門家へ相談してください。
             </p>
           </section>
         </div>
@@ -153,6 +204,11 @@ export default function Home() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 text-left">
           <h2 className="text-sm font-bold text-gray-900 mb-3">法人化お役立ち記事</h2>
           <ul className="space-y-2 text-sm">
+            <li>
+              <Link href="/calculation-policy" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
+                計算根拠と前提条件｜このツールの計算モデル
+              </Link>
+            </li>
             <li>
               <Link href="/articles/timing" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
                 法人化のベストタイミングとは？判断基準を徹底解説
@@ -193,6 +249,10 @@ export default function Home() {
           <span>|</span>
           <Link href="/contact" className="hover:text-gray-600 transition-colors">
             お問い合わせ・運営者情報
+          </Link>
+          <span>|</span>
+          <Link href="/about" className="hover:text-gray-600 transition-colors">
+            このサイトについて
           </Link>
           <span>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
         </div>

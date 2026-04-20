@@ -20,6 +20,12 @@ export default function SocialInsuranceArticle() {
       <main className="max-w-lg mx-auto px-4 py-8">
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6 text-gray-800 text-sm leading-relaxed">
           <h1 className="text-xl font-bold text-gray-900">個人事業主と法人の社会保険を比較｜国保vs社保の違い</h1>
+          <p className="text-xs text-gray-500">
+            最終更新日: 2026年4月20日 ／
+            <Link href="/calculation-policy" className="text-blue-600 hover:underline ml-1">
+              シミュレーターの計算根拠
+            </Link>
+          </p>
 
           <p>
             法人化を検討する際、税金と並んで重要なのが<strong>社会保険料</strong>の違いです。個人事業主は国民健康保険＋国民年金、法人役員は健康保険＋厚生年金に加入します。それぞれの仕組みと負担額の違いを解説します。
@@ -131,6 +137,9 @@ export default function SocialInsuranceArticle() {
             <p className="mt-2">
               <Link href="/" className="text-blue-600 hover:underline">法人化シミュレーター</Link>
               では、社会保険料を含めた総合的な負担額の比較ができます。
+              社会保険料の試算前提は
+              <Link href="/calculation-policy" className="text-blue-600 hover:underline">計算根拠ページ</Link>
+              にまとめています。
             </p>
           </section>
         </article>

@@ -20,6 +20,12 @@ export default function TaxComparisonArticle() {
       <main className="max-w-lg mx-auto px-4 py-8">
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6 text-gray-800 text-sm leading-relaxed">
           <h1 className="text-xl font-bold text-gray-900">個人事業主と法人の税金を徹底比較｜どちらが得？</h1>
+          <p className="text-xs text-gray-500">
+            最終更新日: 2026年4月20日 ／
+            <Link href="/calculation-policy" className="text-blue-600 hover:underline ml-1">
+              シミュレーターの計算根拠
+            </Link>
+          </p>
 
           <p>
             「法人化すると税金が安くなる」と聞いたことがある方も多いでしょう。しかし実際には、所得水準や経費構造によって有利・不利が変わります。この記事では、個人事業主と法人で課せられる税金の種類と計算方法を比較し、どの段階で法人化が有利になるかを解説します。
@@ -147,6 +153,9 @@ export default function TaxComparisonArticle() {
             <p className="mt-2">
               <Link href="/" className="text-blue-600 hover:underline">法人化シミュレーター</Link>
               を使えば、あなたの売上・経費に基づいた具体的な比較ができます。
+              計算モデルの詳細は
+              <Link href="/calculation-policy" className="text-blue-600 hover:underline">計算根拠ページ</Link>
+              に公開しています。
             </p>
           </section>
         </article>
