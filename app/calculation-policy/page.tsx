@@ -12,7 +12,7 @@ const individualRows = [
   ['所得税', '課税所得に5%〜45%の超過累進税率を適用し、復興特別所得税2.1%を加算'],
   ['住民税', '課税所得 × 10% + 均等割5,000円'],
   ['個人事業税', '(事業所得 − 事業主控除290万円) × 業種別税率'],
-  ['国民健康保険', '所得割・均等割を全国平均に近い簡易モデルで試算'],
+  ['国民健康保険', '所得割・均等割を固定の料率による簡易モデル（自治体別の実額ではありません）で試算'],
   ['国民年金', '月額16,980円 × 12か月'],
 ]
 
@@ -80,6 +80,16 @@ export default function CalculationPolicy() {
           </section>
 
           <section>
+            <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">計算モデルの対象年度と制約</h2>
+            <p>現行モデルは2024年度の国民年金（月額16,980円）・協会けんぽ東京の料率、基礎控除48万円・給与所得控除の最低額55万円を使用しています。2025年以降の控除改正や2026年度の保険料を反映した税額計算ではありません。</p>
+            <p className="mt-3">住民税に所得税と同じ課税所得を使用し、個人事業主側では社会保険料控除を課税所得から差し引いていません。個人事業税は青色申告控除後の事業所得を使う簡易モデルです。標準報酬月額も正式な等級表ではなく千円単位に丸める近似で、最低等級の処理や役員の介護保険料を再現していません。実際の税額・保険料とは差が生じます。</p>
+            <p className="mt-3">年度や地域をそろえた実額を確認する際は、以下の公式資料と自治体の国保料率を使って再計算してください。</p>
+            <ul className="list-disc pl-5 mt-3 space-y-2">
+              <li><a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" className="text-blue-600 underline">国税庁：所得税の税率</a></li>
+              <li><a href="https://www.nenkin.go.jp/service/riyoushabetsu/cooperator/kakehashi/87.files/87.pdf" className="text-blue-600 underline">日本年金機構：2024年度の国民年金保険料</a></li>
+            </ul>
+          </section>
+          <section>
             <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">個人事業主側の計算</h2>
             <DataTable rows={individualRows} />
           </section>
@@ -110,7 +120,7 @@ export default function CalculationPolicy() {
               税率、社会保険料率、控除額に関する前提は、公開情報や制度改正に合わせて見直します。大きな制度変更があった場合は、計算ロジックと記事内容を順次更新します。
             </p>
             <p className="mt-2 text-xs text-gray-500">
-              最終更新日: 2026年4月20日
+              最終更新日: 2026年10月10日
             </p>
           </section>
 

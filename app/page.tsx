@@ -202,8 +202,8 @@ export default function Home() {
       <footer className="max-w-lg mx-auto px-4 pb-8 space-y-6 text-center text-xs text-gray-400">
         {/* 関連記事リンク */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 text-left">
-          <h2 className="text-sm font-bold text-gray-900 mb-3">法人化お役立ち記事</h2>
-          <ul className="space-y-2 text-sm">
+          <p className="text-xs text-gray-600 mb-3">現行モデルは2024年度の数値を一部使用する概算です。対象年度と制約は計算根拠をご確認ください。</p><h2 className="text-sm font-bold text-gray-900 mb-3">法人化お役立ち記事</h2>
+          <ul className="space-y-2 text-sm"><li><Link href="/examples" className="text-blue-600 hover:underline">3つの計算例と結果の読み方</Link></li>
             <li>
               <Link href="/calculation-policy" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
                 計算根拠と前提条件｜このツールの計算モデル

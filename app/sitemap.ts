@@ -4,6 +4,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://hojinka-checker.com'
 
   return [
+    { url: `${baseUrl}/examples`, lastModified: new Date("2026-10-10"), changeFrequency: "monthly", priority: 0.8 },
     {
       url: baseUrl,
       lastModified: new Date(),
