@@ -1,5 +1,25 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import SiteHeader from '@/components/SiteHeader'
+import SiteFooter from '@/components/SiteFooter'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import RelatedArticles from '@/components/RelatedArticles'
+import { getArticle } from '@/lib/articles'
+import { calcIndividual, calcCorporate } from '@/lib/taxCalculations'
+import type { InputData } from '@/lib/types'
+
+// 比較例：事業所得600万円・40歳・単身、法人化後は役員報酬600万円（月50万円）
+const sampleInput: InputData = {
+  revenue: 6_650_000, expenses: 0, blueFormDeduction: 650_000, familyWorkerSalary: 0,
+  hasSpouse: false, dependents: 0, ideco: 0, age: 40, directorSalary: 6_000_000,
+  industryTaxRate: 0.05, mortgageDeduction: 0, medicalExpenses: 0, lifeInsuranceDeduction: 0,
+  earthquakeInsurance: 0, donationDeduction: 0, spouseDirectorSalary: 0,
+}
+const ind = calcIndividual(sampleInput)
+const corp = calcCorporate(sampleInput)
+const pensionEmployee = Math.floor(500_000 * 12 * 0.183 / 2)
+const healthEmployee = corp.director.socialInsurance - pensionEmployee
+const man = (n: number) => `約${Math.round(n / 10_000)}万円`
 
 export const metadata: Metadata = {
   title: '個人事業主と法人の社会保険を比較｜国保vs社保の違い | 法人化シミュレーター',
@@ -9,19 +29,14 @@ export const metadata: Metadata = {
 export default function SocialInsuranceArticle() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-            トップへ戻る
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="max-w-lg mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ name: '記事一覧', href: '/articles' }, { name: getArticle('social-insurance')!.title, href: '/articles/social-insurance' }]} />
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6 text-gray-800 text-sm leading-relaxed">
           <h1 className="text-xl font-bold text-gray-900">個人事業主と法人の社会保険を比較｜国保vs社保の違い</h1>
           <p className="text-xs text-gray-500">
-            最終更新日: 2026年4月20日 ／
+            最終更新日: 2026年10月29日 ／
             <Link href="/calculation-policy" className="text-blue-600 hover:underline ml-1">
               シミュレーターの計算根拠
             </Link>
@@ -39,7 +54,7 @@ export default function SocialInsuranceArticle() {
                 <ul className="list-disc list-inside space-y-1 mt-1 text-gray-600">
                   <li>前年の所得に基づいて保険料が決まる</li>
                   <li>自治体によって保険料率が異なる</li>
-                  <li>上限額は年間約106万円（2024年度）</li>
+                  <li>上限額は年間113万円（令和8年度。子ども・子育て支援金分3万円が新設）</li>
                   <li>扶養の概念がなく、家族の人数分の保険料がかかる</li>
                   <li>傷病手当金・出産手当金がない</li>
                 </ul>
@@ -47,7 +62,7 @@ export default function SocialInsuranceArticle() {
               <div>
                 <h3 className="font-bold text-gray-700">国民年金</h3>
                 <ul className="list-disc list-inside space-y-1 mt-1 text-gray-600">
-                  <li>月額16,980円（2024年度）で定額</li>
+                  <li>月額17,920円（令和8年度）で定額</li>
                   <li>老齢基礎年金のみ（満額で月約6.8万円）</li>
                   <li>付加年金やiDeCoで上乗せ可能</li>
                 </ul>
@@ -62,7 +77,7 @@ export default function SocialInsuranceArticle() {
                 <h3 className="font-bold text-gray-700">健康保険（社保）</h3>
                 <ul className="list-disc list-inside space-y-1 mt-1 text-gray-600">
                   <li>役員報酬（標準報酬月額）に基づいて保険料が決まる</li>
-                  <li>会社と本人で折半（各約5%）</li>
+                  <li>会社と本人で折半（東京都は健康保険9.85%＋40〜64歳は介護1.62%＋子ども・子育て支援金0.23%、令和8年度）</li>
                   <li>扶養家族は追加保険料なしで加入可能</li>
                   <li>傷病手当金・出産手当金がある</li>
                 </ul>
@@ -81,7 +96,7 @@ export default function SocialInsuranceArticle() {
 
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">負担額の比較例</h2>
-            <p>年間所得600万円の場合の概算比較：</p>
+            <p>事業所得600万円・40歳・単身の個人事業主と、同じ利益で役員報酬を年600万円（月50万円）に設定した場合の比較です（国保は東京23区、社保は協会けんぽ東京の令和8年度料率で当サイトの計算モデルにより算出）。</p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse mt-2">
                 <thead>
@@ -94,23 +109,23 @@ export default function SocialInsuranceArticle() {
                 <tbody>
                   <tr>
                     <td className="border border-gray-300 px-3 py-2">健康保険料</td>
-                    <td className="border border-gray-300 px-3 py-2 text-right">約65万円<br /><span className="text-gray-500">（国保・全額自己負担）</span></td>
-                    <td className="border border-gray-300 px-3 py-2 text-right">約35万円<br /><span className="text-gray-500">（本人負担分）</span></td>
+                    <td className="border border-gray-300 px-3 py-2 text-right">{man(ind.nhi)}<br /><span className="text-gray-500">（国保・全額自己負担）</span></td>
+                    <td className="border border-gray-300 px-3 py-2 text-right">{man(healthEmployee)}<br /><span className="text-gray-500">（健保・介護・支援金の本人負担分）</span></td>
                   </tr>
                   <tr>
                     <td className="border border-gray-300 px-3 py-2">年金保険料</td>
-                    <td className="border border-gray-300 px-3 py-2 text-right">約20万円<br /><span className="text-gray-500">（国民年金・定額）</span></td>
-                    <td className="border border-gray-300 px-3 py-2 text-right">約55万円<br /><span className="text-gray-500">（厚生年金・本人負担分）</span></td>
+                    <td className="border border-gray-300 px-3 py-2 text-right">{man(ind.pension)}<br /><span className="text-gray-500">（国民年金・定額）</span></td>
+                    <td className="border border-gray-300 px-3 py-2 text-right">{man(pensionEmployee)}<br /><span className="text-gray-500">（厚生年金・本人負担分）</span></td>
                   </tr>
                   <tr className="font-bold bg-gray-50">
                     <td className="border border-gray-300 px-3 py-2">本人負担合計</td>
-                    <td className="border border-gray-300 px-3 py-2 text-right">約85万円</td>
-                    <td className="border border-gray-300 px-3 py-2 text-right">約90万円</td>
+                    <td className="border border-gray-300 px-3 py-2 text-right">{man(ind.socialInsurance)}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-right">{man(corp.director.socialInsurance)}</td>
                   </tr>
                   <tr className="bg-yellow-50">
                     <td className="border border-gray-300 px-3 py-2">会社負担分</td>
                     <td className="border border-gray-300 px-3 py-2 text-right">—</td>
-                    <td className="border border-gray-300 px-3 py-2 text-right">約90万円</td>
+                    <td className="border border-gray-300 px-3 py-2 text-right">{man(corp.socialInsuranceEmployer)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -149,16 +164,11 @@ export default function SocialInsuranceArticle() {
             シミュレーターで試してみる
           </Link>
         </div>
+
+        <RelatedArticles currentSlug="social-insurance" />
       </main>
 
-      <footer className="max-w-lg mx-auto px-4 pb-8 pt-4 text-center">
-        <Link href="/" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-          トップページへ戻る
-        </Link>
-        <p className="mt-6 text-xs text-gray-400">
-          © {new Date().getFullYear()} 法人化シミュレーター
-        </p>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

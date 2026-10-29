@@ -1,5 +1,10 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import SiteHeader from '@/components/SiteHeader'
+import SiteFooter from '@/components/SiteFooter'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import RelatedArticles from '@/components/RelatedArticles'
+import { getArticle } from '@/lib/articles'
 
 export const metadata: Metadata = {
   title: '法人化の手続きガイド｜設立までの流れと必要書類 | 法人化シミュレーター',
@@ -9,15 +14,10 @@ export const metadata: Metadata = {
 export default function ProcedureArticle() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-            トップへ戻る
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="max-w-lg mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ name: '記事一覧', href: '/articles' }, { name: getArticle('procedure')!.title, href: '/articles/procedure' }]} />
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6 text-gray-800 text-sm leading-relaxed">
           <h1 className="text-xl font-bold text-gray-900">法人化の手続きガイド｜設立までの流れと必要書類</h1>
           <p className="text-xs text-gray-500">
@@ -181,16 +181,11 @@ export default function ProcedureArticle() {
             シミュレーターで試してみる
           </Link>
         </div>
+
+        <RelatedArticles currentSlug="procedure" />
       </main>
 
-      <footer className="max-w-lg mx-auto px-4 pb-8 pt-4 text-center">
-        <Link href="/" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-          トップページへ戻る
-        </Link>
-        <p className="mt-6 text-xs text-gray-400">
-          © {new Date().getFullYear()} 法人化シミュレーター
-        </p>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

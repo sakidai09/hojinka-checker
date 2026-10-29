@@ -13,8 +13,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://hojinka-checker.com"),
   title: "法人化シミュレーター",
   description: "個人事業主が法人化した場合の税負担を比較・シミュレーション",
+  applicationName: "法人化シミュレーター",
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    siteName: "法人化シミュレーター",
+  },
+  twitter: {
+    card: "summary",
+  },
 };
 
 export default function RootLayout({

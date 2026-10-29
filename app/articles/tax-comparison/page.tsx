@@ -1,5 +1,10 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import SiteHeader from '@/components/SiteHeader'
+import SiteFooter from '@/components/SiteFooter'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import RelatedArticles from '@/components/RelatedArticles'
+import { getArticle } from '@/lib/articles'
 
 export const metadata: Metadata = {
   title: '個人事業主と法人の税金を徹底比較｜どちらが得？ | 法人化シミュレーター',
@@ -9,19 +14,14 @@ export const metadata: Metadata = {
 export default function TaxComparisonArticle() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-            トップへ戻る
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="max-w-lg mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ name: '記事一覧', href: '/articles' }, { name: getArticle('tax-comparison')!.title, href: '/articles/tax-comparison' }]} />
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6 text-gray-800 text-sm leading-relaxed">
           <h1 className="text-xl font-bold text-gray-900">個人事業主と法人の税金を徹底比較｜どちらが得？</h1>
           <p className="text-xs text-gray-500">
-            最終更新日: 2026年4月20日 ／
+            最終更新日: 2026年10月29日 ／
             <Link href="/calculation-policy" className="text-blue-600 hover:underline ml-1">
               シミュレーターの計算根拠
             </Link>
@@ -52,7 +52,7 @@ export default function TaxComparisonArticle() {
               </li>
               <li>
                 <strong>国民健康保険料</strong>
-                <p className="mt-1 text-gray-600">所得に応じて計算。上限額は年間約106万円（2024年度）。</p>
+                <p className="mt-1 text-gray-600">所得と世帯人数に応じて計算。上限額は年間113万円（令和8年度）。</p>
               </li>
             </ul>
           </section>
@@ -165,16 +165,11 @@ export default function TaxComparisonArticle() {
             シミュレーターで試してみる
           </Link>
         </div>
+
+        <RelatedArticles currentSlug="tax-comparison" />
       </main>
 
-      <footer className="max-w-lg mx-auto px-4 pb-8 pt-4 text-center">
-        <Link href="/" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-          トップページへ戻る
-        </Link>
-        <p className="mt-6 text-xs text-gray-400">
-          © {new Date().getFullYear()} 法人化シミュレーター
-        </p>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

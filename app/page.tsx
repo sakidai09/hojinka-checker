@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import InputForm from '@/components/InputForm'
 import ResultDisplay from '@/components/ResultDisplay'
+import SiteHeader from '@/components/SiteHeader'
+import SiteFooter from '@/components/SiteFooter'
 import { InputData } from '@/lib/types'
 import { compare } from '@/lib/taxCalculations'
 import type { ComparisonResult } from '@/lib/types'
@@ -83,30 +84,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-4 space-y-3">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="法人化シミュレーター ロゴ" width={32} height={32} className="object-contain" priority />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">法人化シミュレーター</h1>
-              <p className="text-xs text-gray-500">{subtitle}</p>
-            </div>
-          </div>
-          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-            <Link href="/calculation-policy" className="hover:text-blue-600 transition-colors">
-              計算根拠
-            </Link>
-            <Link href="/articles/timing" className="hover:text-blue-600 transition-colors">
-              法人化ガイド
-            </Link>
-            <Link href="/about" className="hover:text-blue-600 transition-colors">
-              このサイトについて
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="max-w-lg mx-auto px-4 py-6">
+        <div className="mb-4">
+          <h1 className="text-xl font-bold text-gray-900">法人化シミュレーター</h1>
+          <p className="text-xs text-gray-500">{subtitle}</p>
+        </div>
+
         {result ? (
           <ResultDisplay result={result} input={input} onReset={handleReset} />
         ) : (
@@ -199,64 +184,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="max-w-lg mx-auto px-4 pb-8 space-y-6 text-center text-xs text-gray-400">
-        {/* 関連記事リンク */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 text-left">
-          <p className="text-xs text-gray-600 mb-3">現行モデルは2024年度の数値を一部使用する概算です。対象年度と制約は計算根拠をご確認ください。</p><h2 className="text-sm font-bold text-gray-900 mb-3">法人化お役立ち記事</h2>
-          <ul className="space-y-2 text-sm"><li><Link href="/examples" className="text-blue-600 hover:underline">3つの計算例と結果の読み方</Link></li>
-            <li>
-              <Link href="/calculation-policy" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
-                計算根拠と前提条件｜このツールの計算モデル
-              </Link>
-            </li>
-            <li>
-              <Link href="/articles/timing" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
-                法人化のベストタイミングとは？判断基準を徹底解説
-              </Link>
-            </li>
-            <li>
-              <Link href="/articles/procedure" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
-                法人化の手続きガイド｜設立までの流れと必要書類
-              </Link>
-            </li>
-            <li>
-              <Link href="/articles/tax-comparison" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
-                個人事業主と法人の税金を徹底比較｜どちらが得？
-              </Link>
-            </li>
-            <li>
-              <Link href="/articles/social-insurance" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
-                個人事業主と法人の社会保険を比較｜国保vs社保の違い
-              </Link>
-            </li>
-            <li>
-              <Link href="/articles/micro-corp" className="text-blue-600 hover:text-blue-800 hover:underline transition-colors">
-                マイクロ法人とは？個人事業主との二刀流で社会保険料を最適化
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <p>本ツールの計算結果はあくまで参考値です。<br />正確な税額・社会保険料は税理士・社労士にご相談ください。</p>
-        <div className="flex flex-wrap justify-center items-center gap-3 text-gray-400">
-          <Link href="/terms" className="hover:text-gray-600 transition-colors">
-            利用規約
-          </Link>
-          <span>|</span>
-          <Link href="/privacy" className="hover:text-gray-600 transition-colors">
-            プライバシーポリシー
-          </Link>
-          <span>|</span>
-          <Link href="/contact" className="hover:text-gray-600 transition-colors">
-            お問い合わせ・運営者情報
-          </Link>
-          <span>|</span>
-          <Link href="/about" className="hover:text-gray-600 transition-colors">
-            このサイトについて
-          </Link>
-          <span>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

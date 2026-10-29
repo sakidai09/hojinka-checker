@@ -1,5 +1,7 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
+import SiteHeader from '@/components/SiteHeader'
+import SiteFooter from '@/components/SiteFooter'
+import Breadcrumbs from '@/components/Breadcrumbs'
 
 export const metadata: Metadata = {
   title: 'お問い合わせ・運営者情報 | 法人化シミュレーター',
@@ -9,19 +11,11 @@ export const metadata: Metadata = {
 export default function Contact() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">お問い合わせ・運営者情報</h1>
-          <Link
-            href="/"
-            className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            トップへ戻る
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="max-w-lg mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ name: 'お問い合わせ・運営者情報', href: '/contact' }]} />
+        <h1 className="text-xl font-bold text-gray-900 mb-4">お問い合わせ・運営者情報</h1>
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-8 text-gray-800 text-sm leading-relaxed">
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">お問い合わせ</h2>
@@ -87,14 +81,7 @@ export default function Contact() {
         </div>
       </main>
 
-      <footer className="max-w-lg mx-auto px-4 pb-8 pt-4 text-center">
-        <Link href="/" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
-          トップページへ戻る
-        </Link>
-        <p className="mt-6 text-xs text-gray-400">
-          © {new Date().getFullYear()} 法人化シミュレーター
-        </p>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

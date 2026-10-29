@@ -435,15 +435,15 @@ export default function ResultDisplay({
                 individual={individual.socialInsurance}
                 corporation={corporation.director.socialInsurance}
                 note={{
-                  ind:  `国保（全国平均）＋国民年金16,980円/月 → 事業所得に対する実質${nhiEff}%`,
-                  corp: `健保4.99%＋厚年9.15%（折半）→ 役員報酬に対する実効${corpSocEff}%`,
+                  ind:  `国保（東京23区・令和8年度）＋国民年金17,920円/月${input.hasSpouse ? '×2人' : ''} → 事業所得に対する実質${nhiEff}%`,
+                  corp: `健保4.925%${input.age >= 40 && input.age < 65 ? '＋介護0.81%' : ''}＋子育て支援金0.115%＋厚年9.15%（折半）→ 役員報酬に対する実効${corpSocEff}%`,
                 }}
               />
               <Row
                 label="社会保険（会社負担）"
                 individual={0}
                 corporation={corporation.socialInsuranceEmployer}
-                note={{ corp: `健保4.99%＋厚年9.15%＋児童拠出金0.36%（協会けんぽ東京2024年度）` }}
+                note={{ corp: `本人と同額＋子ども・子育て拠出金0.36%（協会けんぽ東京・令和8年度）` }}
               />
               {corporation.spouseDirector && (
                 <Row
@@ -467,8 +467,9 @@ export default function ResultDisplay({
       <div className="bg-white rounded-xl border border-gray-200 p-5">
         <h3 className="font-semibold text-gray-800 mb-2">計算の前提・注意点</h3>
         <ul className="text-xs text-gray-500 space-y-1 list-disc list-inside">
-          <li>社会保険料は協会けんぽ東京（2024年度）の料率で試算（地域により異なります）</li>
-          <li>国民健康保険料は全国平均ベースの簡易計算です（自治体により大きく異なります）</li>
+          <li>税制は2026年（令和8年）分、社会保険料は協会けんぽ東京（令和8年度）の料率と標準報酬月額の等級で試算（地域により異なります）</li>
+          <li>国民健康保険料は東京23区（新宿区）の令和8年度料率で試算しています（自治体により大きく異なります）</li>
+          <li>配偶者ありの場合、個人事業主側では配偶者も国民年金・国保に加入、法人側では代表者の扶養（第3号被保険者）に入る前提です</li>
           <li>法人化後の残余利益は法人内留保として計算（役員報酬以外の分配なし）</li>
           <li>消費税の節税効果は概算です。インボイス登録状況や業種により大きく異なります</li>
           <li>本ツールの計算は参考値です。正確な税額は税理士にご相談ください</li>

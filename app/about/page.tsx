@@ -1,5 +1,8 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import SiteHeader from '@/components/SiteHeader'
+import SiteFooter from '@/components/SiteFooter'
+import Breadcrumbs from '@/components/Breadcrumbs'
 
 export const metadata: Metadata = {
   title: 'このサイトについて・運営者情報 | 法人化シミュレーター',
@@ -9,16 +12,11 @@ export const metadata: Metadata = {
 export default function About() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <h1 className="text-xl font-bold text-gray-900">このサイトについて</h1>
-          <Link href="/" className="shrink-0 text-sm text-blue-600 hover:text-blue-800 transition-colors">
-            トップへ戻る
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="max-w-lg mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ name: 'このサイトについて', href: '/about' }]} />
+        <h1 className="text-xl font-bold text-gray-900 mb-4">このサイトについて</h1>
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-8 text-gray-800 text-sm leading-relaxed">
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">サイトの目的</h2>
@@ -100,6 +98,8 @@ export default function About() {
           </section>
         </article>
       </main>
+
+      <SiteFooter />
     </div>
   )
 }

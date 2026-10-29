@@ -1,5 +1,8 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import SiteHeader from '@/components/SiteHeader'
+import SiteFooter from '@/components/SiteFooter'
+import Breadcrumbs from '@/components/Breadcrumbs'
 
 export const metadata: Metadata = {
   title: '計算根拠と前提条件 | 法人化シミュレーター',
@@ -8,21 +11,22 @@ export const metadata: Metadata = {
 
 const individualRows = [
   ['事業所得', '売上高 − 経費 − 青色申告特別控除 − 専従者給与'],
-  ['課税所得', '事業所得 − 基礎控除 − 配偶者控除 − 扶養控除 − iDeCo等 − その他の所得控除'],
-  ['所得税', '課税所得に5%〜45%の超過累進税率を適用し、復興特別所得税2.1%を加算'],
-  ['住民税', '課税所得 × 10% + 均等割5,000円'],
+  ['国民健康保険', '(事業所得 − 43万円) × 所得割率 ＋ 均等割（世帯人数分）。東京23区（新宿区）の令和8年度料率：医療分7.51%・47,600円（上限67万円）、支援金分2.80%・17,600円（上限26万円）、介護分2.43%・17,800円（40〜64歳、上限17万円）、子ども・子育て支援金分0.27%・1,873円（上限3万円）'],
+  ['国民年金', '月額17,920円（令和8年度）× 12か月。配偶者ありの場合は配偶者分も加算'],
+  ['所得税の課税所得', '事業所得 − 基礎控除（合計所得489万円以下104万円／655万円以下67万円／2,350万円以下62万円）− 配偶者控除38万円 − 扶養控除38万円 − 社会保険料控除（国保・国民年金）− iDeCo等 − その他の所得控除'],
+  ['所得税', '課税所得に5%〜45%の超過累進税率を適用し、復興特別所得税2.1%を加算。住宅ローン控除は税額から控除'],
+  ['住民税', '基礎控除43万円・配偶者控除33万円・扶養控除33万円で住民税用の課税所得を別に計算し、所得割10% ＋ 均等割等5,000円'],
   ['個人事業税', '(事業所得 − 事業主控除290万円) × 業種別税率'],
-  ['国民健康保険', '所得割・均等割を固定の料率による簡易モデル（自治体別の実額ではありません）で試算'],
-  ['国民年金', '月額16,980円 × 12か月'],
 ]
 
 const corporateRows = [
-  ['役員の給与所得', '役員報酬 − 給与所得控除'],
-  ['役員の課税所得', '給与所得 − 基礎控除 − 扶養控除 − 社会保険料控除 − その他の所得控除'],
-  ['役員の所得税・住民税', '個人側と同じ税率で計算。住宅ローン控除は所得税額から控除'],
-  ['社会保険料', '協会けんぽ東京の料率をもとに、本人負担分と会社負担分を分けて試算'],
+  ['役員の給与所得', '役員報酬 − 給与所得控除（令和8年分：最低保障額74万円、収入360万円以下は30%＋8万円）'],
+  ['標準報酬月額', '報酬月額を健康保険50等級（5.8万〜139万円）・厚生年金32等級（8.8万〜65万円）の等級表に当てはめて決定'],
+  ['社会保険料', '協会けんぽ東京 令和8年度：健康保険9.85%、介護保険1.62%（40〜64歳）、子ども・子育て支援金0.23%、厚生年金18.3%を労使折半。子ども・子育て拠出金0.36%は会社のみ負担'],
+  ['役員の所得税・住民税', '個人事業主側と同じ控除・税率で計算（社会保険料控除は本人負担分）'],
+  ['配偶者', '配偶者役員報酬を設定しない場合、配偶者は代表者の健康保険の扶養・国民年金第3号被保険者とする'],
   ['法人課税所得', '売上高 − 経費 − 役員報酬 − 会社負担社会保険料 − 配偶者役員報酬等'],
-  ['法人税等', '中小法人を前提に、法人税・地方法人税・法人住民税・法人事業税を概算'],
+  ['法人税等', '中小法人を前提に、法人税（800万円以下15%・超過分23.2%）・地方法人税10.3%・法人住民税法人税割7%・法人事業税（3.5%／5.3%／7.0%）・特別法人事業税37%で概算'],
   ['法人住民税均等割', '赤字でも発生する固定費として年70,000円を計上'],
 ]
 
@@ -58,16 +62,11 @@ function DataTable({ rows }: { rows: string[][] }) {
 export default function CalculationPolicy() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <h1 className="text-xl font-bold text-gray-900">計算根拠と前提条件</h1>
-          <Link href="/" className="shrink-0 text-sm text-blue-600 hover:text-blue-800 transition-colors">
-            トップへ戻る
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="max-w-lg mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ name: '計算根拠と前提条件', href: '/calculation-policy' }]} />
+        <h1 className="text-xl font-bold text-gray-900 mb-4">計算根拠と前提条件</h1>
         <article className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-7 text-gray-800 text-sm leading-relaxed">
           <section className="space-y-3">
             <p>
@@ -81,12 +80,24 @@ export default function CalculationPolicy() {
 
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-2 border-b pb-2">計算モデルの対象年度と制約</h2>
-            <p>現行モデルは2024年度の国民年金（月額16,980円）・協会けんぽ東京の料率、基礎控除48万円・給与所得控除の最低額55万円を使用しています。2025年以降の控除改正や2026年度の保険料を反映した税額計算ではありません。</p>
-            <p className="mt-3">住民税に所得税と同じ課税所得を使用し、個人事業主側では社会保険料控除を課税所得から差し引いていません。個人事業税は青色申告控除後の事業所得を使う簡易モデルです。標準報酬月額も正式な等級表ではなく千円単位に丸める近似で、最低等級の処理や役員の介護保険料を再現していません。実際の税額・保険料とは差が生じます。</p>
-            <p className="mt-3">年度や地域をそろえた実額を確認する際は、以下の公式資料と自治体の国保料率を使って再計算してください。</p>
+            <p>現行モデルは<strong>2026年（令和8年）分の所得税・住民税</strong>と<strong>令和8年度の社会保険料</strong>を使用しています。令和8年度税制改正による基礎控除の引上げ（最大104万円）と給与所得控除の最低保障額74万円、令和8年4月分から始まった子ども・子育て支援金を反映しています。</p>
+            <p className="mt-3">一方で、以下は簡易化しています。国民健康保険は東京23区の料率で、自治体による差は反映していません。扶養親族は一般の扶養親族（38万円）として扱い、特定扶養親族・老人扶養親族の区分、住民税の調整控除、未就学児の国保均等割軽減は計算していません。配偶者役員の介護保険料は代表者と同じ年齢区分と仮定しています。個人事業税は青色申告控除後の事業所得を使う簡易モデルです。実際の税額・保険料とは差が生じます。</p>
+            <p className="mt-3">数値は次の公式資料で確認しています（2026年10月29日確認）。</p>
             <ul className="list-disc pl-5 mt-3 space-y-2">
-              <li><a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" className="text-blue-600 underline">国税庁：所得税の税率</a></li>
-              <li><a href="https://www.nenkin.go.jp/service/riyoushabetsu/cooperator/kakehashi/87.files/87.pdf" className="text-blue-600 underline">日本年金機構：2024年度の国民年金保険料</a></li>
+              <li><a href="https://www.nta.go.jp/publication/pamph/gensen/2026kaisei.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">国税庁：源泉所得税の改正のあらまし（令和8年4月）</a></li>
+              <li><a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">国税庁：所得税の税率</a></li>
+              <li><a href="https://www.nenkin.go.jp/oshirase/taisetu/kojin/2026/202604/0401.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">日本年金機構：令和8年度の国民年金保険料</a></li>
+              <li><a href="https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/rate_prefectures/r08" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">協会けんぽ：令和8年度 都道府県単位保険料率</a></li>
+              <li><a href="https://www.city.shinjuku.lg.jp/hoken/hoken01_001028.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">新宿区：国民健康保険料の計算方法（令和8年度）</a></li>
+              <li><a href="https://www2.city.kyoto.lg.jp/shikai/img/iinkai/soumushoubou/R08/data/080525gyouzai.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">京都市：個人市民税の基礎控除・給与所得控除の改正概要</a></li>
+            </ul>
+            <h3 className="font-bold text-gray-900 mt-4">2026年10月の計算モデル更新内容</h3>
+            <ul className="list-disc pl-5 mt-2 space-y-1">
+              <li>2024年度の数値から、2026年分の控除・令和8年度の保険料率に更新</li>
+              <li>個人事業主側で国保・国民年金の社会保険料控除を差し引くよう修正</li>
+              <li>住民税の課税所得を住民税の控除額（基礎控除43万円等）で別に計算</li>
+              <li>標準報酬月額を正式な等級表で決定し、役員の介護保険料（40〜64歳）を反映</li>
+              <li>配偶者がいる場合の国民年金・国保均等割（個人側）と扶養（法人側）の違いを反映</li>
             </ul>
           </section>
           <section>
@@ -120,7 +131,7 @@ export default function CalculationPolicy() {
               税率、社会保険料率、控除額に関する前提は、公開情報や制度改正に合わせて見直します。大きな制度変更があった場合は、計算ロジックと記事内容を順次更新します。
             </p>
             <p className="mt-2 text-xs text-gray-500">
-              最終更新日: 2026年10月10日
+              最終更新日: 2026年10月29日
             </p>
           </section>
 
@@ -138,6 +149,8 @@ export default function CalculationPolicy() {
           </Link>
         </div>
       </main>
+
+      <SiteFooter />
     </div>
   )
 }
