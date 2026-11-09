@@ -39,10 +39,8 @@ const PROMPT = `この書類は日本の確定申告書や収支内訳書・青�
 
 export async function POST(req: NextRequest) {
   if (!process.env.GEMINI_API_KEY) {
-    return NextResponse.json(
-      { error: 'APIキーが設定されていません。環境変数 GEMINI_API_KEY を設定してください。' },
-      { status: 500 }
-    )
+    console.error('[OCR] GEMINI_API_KEY is not set')
+    return NextResponse.json({ error: UNAVAILABLE_MESSAGE }, { status: 503 })
   }
 
   try {
@@ -82,7 +80,7 @@ export async function POST(req: NextRequest) {
     if (!jsonMatch) {
       console.error('[OCR] JSON not found in response:', text)
       return NextResponse.json(
-        { error: '読み取り結果を解析できませんでした。別のファイルをお試しください。', raw: text },
+        { error: '書類の数値を読み取れませんでした。明るく鮮明な画像で撮り直すか、下の欄に直接入力してください。' },
         { status: 422 }
       )
     }
@@ -104,8 +102,22 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ data: extracted })
   } catch (err) {
+    // 詳細はサーバーログにだけ残し、利用者には平易な文だけ返す
     const msg = err instanceof Error ? err.message : String(err)
     console.error('[OCR] Error:', msg)
-    return NextResponse.json({ error: `読み取りに失敗しました: ${msg}` }, { status: 500 })
+    return NextResponse.json({ error: toUserMessage(msg) }, { status: 500 })
   }
+}
+
+const UNAVAILABLE_MESSAGE =
+  '自動読み取り機能は現在ご利用いただけません。お手数ですが、下の欄に数値を直接入力してください。'
+
+function toUserMessage(msg: string): string {
+  // APIキー無効・権限エラー（運営側の設定の問題）
+  if (/API key|API_KEY|PERMISSION_DENIED|\[40[13]/i.test(msg)) return UNAVAILABLE_MESSAGE
+  // 利用上限・混雑
+  if (/\[429|quota|RESOURCE_EXHAUSTED|\[503|overloaded|UNAVAILABLE/i.test(msg)) {
+    return 'ただいま混み合っています。少し時間をおいてから、もう一度お試しください。'
+  }
+  return '読み取りに失敗しました。時間をおいて再度お試しいただくか、下の欄に数値を直接入力してください。'
 }

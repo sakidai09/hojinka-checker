@@ -204,8 +204,12 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
     form.append('file', file)
     try {
       const res = await fetch('/api/ocr', { method: 'POST', body: form })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error || '読み取り失敗')
+      // サーバーがJSON以外（容量超過・タイムアウト等）を返しても英語エラーを出さない
+      const json = await res.json().catch(() => null)
+      if (!res.ok || !json?.data) {
+        if (res.status === 413) throw new Error('ファイルが大きすぎます。4MB以下の画像でお試しください。')
+        throw new Error(json?.error || '読み取りに失敗しました。時間をおいて再度お試しください。')
+      }
       const d = json.data
       onChange({
         ...data,
@@ -221,7 +225,9 @@ export default function InputForm({ data, onChange, onSubmit }: Props) {
       })
       setOcrStatus('done')
     } catch (e: unknown) {
-      setOcrError(e instanceof Error ? e.message : '読み取りに失敗しました')
+      // 通信断（Failed to fetch 等）の英語メッセージは出さない
+      const fallback = '通信に失敗しました。電波の良い場所で再度お試しください。'
+      setOcrError(e instanceof Error && /[ぁ-んァ-ン一-龥]/.test(e.message) ? e.message : fallback)
       setOcrStatus('error')
     }
   }
