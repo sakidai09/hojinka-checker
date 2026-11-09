@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { ApiError, GoogleGenAI } from '@google/genai'
 import { NextRequest, NextResponse } from 'next/server'
 
 const PROMPT = `この書類は日本の確定申告書や収支内訳書・青色申告決算書のいずれかです。
@@ -60,20 +60,13 @@ export async function POST(req: NextRequest) {
           ? file.type
           : 'image/jpeg') as string
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-    const model = genAI.getGenerativeModel({ model: 'gemini-3.8-flash' })
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
+    const result = await ai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: [{ inlineData: { mimeType, data: base64 } }, { text: PROMPT }],
+    })
 
-    const result = await model.generateContent([
-      {
-        inlineData: {
-          mimeType,
-          data: base64,
-        },
-      },
-      PROMPT,
-    ])
-
-    const text = result.response.text().trim()
+    const text = (result.text ?? '').trim()
     console.log('[OCR] Gemini response:', text)
 
     const jsonMatch = text.match(/\{[\s\S]*\}/)
@@ -104,19 +97,22 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     // 詳細はサーバーログにだけ残し、利用者には平易な文だけ返す
     const msg = err instanceof Error ? err.message : String(err)
-    console.error('[OCR] Error:', msg)
-    return NextResponse.json({ error: toUserMessage(msg) }, { status: 500 })
+    const status = err instanceof ApiError ? err.status : undefined
+    console.error('[OCR] Error:', status ?? '', msg)
+    return NextResponse.json({ error: toUserMessage(msg, status) }, { status: 500 })
   }
 }
 
 const UNAVAILABLE_MESSAGE =
   '自動読み取り機能は現在ご利用いただけません。お手数ですが、下の欄に数値を直接入力してください。'
 
-function toUserMessage(msg: string): string {
-  // APIキー無効・権限エラー（運営側の設定の問題）
-  if (/API key|API_KEY|PERMISSION_DENIED|\[40[13]/i.test(msg)) return UNAVAILABLE_MESSAGE
+function toUserMessage(msg: string, status?: number): string {
+  // APIキー無効・権限エラー・モデル提供終了（運営側の設定の問題）
+  if (status === 401 || status === 403 || status === 404 || /API key|API_KEY|PERMISSION_DENIED/i.test(msg)) {
+    return UNAVAILABLE_MESSAGE
+  }
   // 利用上限・混雑
-  if (/\[429|quota|RESOURCE_EXHAUSTED|\[503|overloaded|UNAVAILABLE/i.test(msg)) {
+  if (status === 429 || status === 503 || /quota|RESOURCE_EXHAUSTED|overloaded|UNAVAILABLE/i.test(msg)) {
     return 'ただいま混み合っています。少し時間をおいてから、もう一度お試しください。'
   }
   return '読み取りに失敗しました。時間をおいて再度お試しいただくか、下の欄に数値を直接入力してください。'
