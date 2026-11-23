@@ -141,8 +141,9 @@ function calcPersonalTaxes(params: {
   return { incomeTaxable, incomeTax, residentTax }
 }
 
-// 国民健康保険（世帯単位）
-function calcNHI(totalIncome: number, members: number, age: number): number {
+// 国民健康保険（世帯単位）。adults は本人と配偶者（子ども・子育て支援金分と介護分の均等割の対象）。
+// 配偶者は本人と同じ年齢区分と仮定し、扶養親族は18歳未満とみなす
+function calcNHI(totalIncome: number, members: number, adults: number, age: number): number {
   const base = Math.max(0, totalIncome - RESIDENT_BASIC_DEDUCTION)
   const part = (p: { rate: number; perCapita: number; cap: number }, n: number) =>
     Math.min(Math.floor(base * p.rate) + p.perCapita * n, p.cap)
@@ -150,8 +151,8 @@ function calcNHI(totalIncome: number, members: number, age: number): number {
   return (
     part(NHI.medical, members)
     + part(NHI.support, members)
-    + (needsCareInsurance(age) ? part(NHI.care, 1) : 0)
-    + part(NHI.child, 1)
+    + (needsCareInsurance(age) ? part(NHI.care, adults) : 0)
+    + part(NHI.child, adults)
   )
 }
 
@@ -162,8 +163,8 @@ export function calcIndividual(input: InputData): IndividualResult {
     input.revenue - input.expenses - input.blueFormDeduction - input.familyWorkerSalary
   )
 
-  const householdMembers = 1 + (input.hasSpouse ? 1 : 0) + input.dependents
-  const nhi = calcNHI(businessIncome, householdMembers, input.age)
+  const adults = 1 + (input.hasSpouse ? 1 : 0)
+  const nhi = calcNHI(businessIncome, adults + input.dependents, adults, input.age)
   // 配偶者控除の対象となる配偶者は自分で国民年金（第1号）に加入する前提
   const pension = NATIONAL_PENSION_MONTHLY * 12 * (input.hasSpouse ? 2 : 1)
   const socialInsurance = nhi + pension
@@ -182,8 +183,8 @@ export function calcIndividual(input: InputData): IndividualResult {
     mortgageDeduction: input.mortgageDeduction,
   })
 
-  // 個人事業税（事業主控除 290万円）
-  const businessTaxBase = Math.max(0, businessIncome - 2_900_000)
+  // 個人事業税（事業主控除 290万円）。青色申告特別控除は適用されないため足し戻す（東京都主税局）
+  const businessTaxBase = Math.max(0, businessIncome + input.blueFormDeduction - 2_900_000)
   const businessTax = Math.floor(businessTaxBase * input.industryTaxRate)
 
   return {

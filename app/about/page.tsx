@@ -54,6 +54,53 @@ export default function About() {
           </section>
 
           <section>
+            <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">計算と記事の作り方</h2>
+            <p>
+              シミュレーターの計算式は
+              <Link href="/calculation-policy" className="text-blue-600 hover:underline mx-1">計算根拠と前提条件</Link>
+              ですべて公開しています。税率・控除額・保険料率は、国税庁、日本年金機構、全国健康保険協会（協会けんぽ）、市区町村などの公式資料で確認した値だけを使い、確認日と出典を明記しています。
+            </p>
+            <p className="mt-2">
+              記事中の「所得○○万円の場合の負担額」などの金額は、手入力ではなく、シミュレーターと同じ計算プログラムでページ表示時に算出しています。そのため、制度改正に合わせて計算モデルを更新すると、記事の表も同じ前提で更新されます。
+            </p>
+            <p className="mt-2">
+              記事の作成にはAIによる下書き支援を使っていますが、掲載する数値・制度の説明は公式資料と照合したうえで公開しています。照合できなかった情報は掲載しません。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">このサイトでできないこと</h2>
+            <ul className="list-disc list-inside space-y-2">
+              <li>個別の税務相談・申告書の作成（税理士法により税理士の業務です）</li>
+              <li>自治体ごとの国民健康保険料の正確な計算（本サイトは東京23区の料率で試算）</li>
+              <li>消費税・インボイス、相続・事業承継などを含めた総合的な判断</li>
+            </ul>
+            <p className="mt-2">
+              シミュレーターの結果は判断の入り口としてお使いいただき、実際に法人を設立する前には税理士・社会保険労務士などの専門家にご相談ください。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">誤りのご指摘・訂正について</h2>
+            <p>
+              計算や記事の内容に誤りを見つけた場合は、
+              <Link href="/contact" className="text-blue-600 hover:underline mx-1">お問い合わせ</Link>
+              からお知らせください。公式資料で確認できた誤りは速やかに修正し、計算モデルに関わる修正は計算根拠ページの更新内容に記載します。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">主な更新履歴</h2>
+            <ul className="space-y-2">
+              <li><span className="text-gray-500 mr-2">2026年11月23日</span>解説記事5本を全面改訂、役員報酬の比較表・国保と社保の所得別比較を追加</li>
+              <li><span className="text-gray-500 mr-2">2026年10月29日</span>計算モデルを2026年（令和8年）分の税制・令和8年度の社会保険料率に更新、損益分岐表と2026年の制度変更の解説を追加</li>
+              <li><span className="text-gray-500 mr-2">2026年10月10日</span>計算例ページと計算の前提条件の説明を追加</li>
+              <li><span className="text-gray-500 mr-2">2026年4月10日</span>解説記事・利用規約・運営者情報を追加</li>
+              <li><span className="text-gray-500 mr-2">2026年3月13日</span>シミュレーターを公開（確定申告書の読み取りによる自動入力に対応）</li>
+            </ul>
+          </section>
+
+          <section>
             <h2 className="text-base font-bold text-gray-900 mb-3 border-b pb-2">運営者情報</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -93,7 +140,7 @@ export default function About() {
               税制や社会保険料の改定があった場合、公開情報を確認したうえで計算前提と記事内容を見直します。専門家による個別監修済みの税務助言ではないため、申告や法人設立の最終判断は専門家へご相談ください。
             </p>
             <p className="mt-2 text-xs text-gray-500">
-              最終更新日: 2026年4月20日
+              最終更新日: 2026年11月23日
             </p>
           </section>
         </article>

@@ -32,7 +32,7 @@ export const articles: Article[] = [
       '個人事業主が法人化すべきタイミングを、売上・所得・消費税の観点から解説。課税所得500万円〜800万円が目安とされる理由や、消費税の免税メリットも紹介します。',
     category: '法人化の判断',
     publishedAt: '2026-04-10',
-    updatedAt: '2026-04-20',
+    updatedAt: '2026-11-23',
   },
   {
     slug: 'micro-corp',
@@ -42,7 +42,7 @@ export const articles: Article[] = [
       'マイクロ法人（ひとり法人）の仕組みと、個人事業主との併用による社会保険料の最適化戦略を解説。メリット・デメリット・注意点をまとめました。',
     category: '法人化の判断',
     publishedAt: '2026-04-10',
-    updatedAt: '2026-04-20',
+    updatedAt: '2026-11-23',
   },
   {
     slug: 'tax-comparison',
@@ -52,7 +52,7 @@ export const articles: Article[] = [
       '所得税vs法人税、住民税、事業税、消費税の違いを個人事業主と法人で比較。累進課税と法人税率の仕組みを分かりやすく解説します。',
     category: '税金・社会保険',
     publishedAt: '2026-04-10',
-    updatedAt: '2026-10-29',
+    updatedAt: '2026-11-23',
   },
   {
     slug: 'social-insurance',
@@ -62,7 +62,7 @@ export const articles: Article[] = [
       '国民健康保険と健康保険（社会保険）の違い、国民年金と厚生年金の比較を解説。法人化で社会保険料はどう変わるのか、メリット・デメリットをまとめました。',
     category: '税金・社会保険',
     publishedAt: '2026-04-10',
-    updatedAt: '2026-10-29',
+    updatedAt: '2026-11-23',
   },
   {
     slug: 'examples',
@@ -94,6 +94,24 @@ export const articles: Article[] = [
     updatedAt: '2026-10-29',
   },
   {
+    slug: 'director-salary',
+    href: '/articles/director-salary',
+    title: '役員報酬はいくらにすべき？事業所得別の負担と手取りの比較表（2026年版）',
+    description: '事業所得500万〜2,000万円で役員報酬を変えたとき、税・社会保険料の合計と個人の手取り、会社に残るお金がどう変わるかを計算モデルで一覧にしました。',
+    category: '計算例・データ',
+    publishedAt: '2026-11-23',
+    updatedAt: '2026-11-23',
+  },
+  {
+    slug: 'nhi-vs-shaho',
+    href: '/articles/nhi-vs-shaho',
+    title: '国民健康保険と社会保険の負担を所得別に比較（2026年度・東京23区）',
+    description: '所得200万〜2,000万円で、個人事業主の国保・国民年金と、法人役員の健康保険・厚生年金（本人＋会社負担）を家族構成別に比較した早見表です。',
+    category: '計算例・データ',
+    publishedAt: '2026-11-23',
+    updatedAt: '2026-11-23',
+  },
+  {
     slug: 'procedure',
     href: '/articles/procedure',
     title: '法人化の手続きガイド｜設立までの流れと必要書類',
@@ -101,7 +119,7 @@ export const articles: Article[] = [
       '個人事業主が法人化する際の手続きを、株式会社・合同会社それぞれのステップで解説。定款作成から登記申請、届出までの流れと費用をまとめました。',
     category: '手続き',
     publishedAt: '2026-04-10',
-    updatedAt: '2026-04-20',
+    updatedAt: '2026-11-23',
   },
 ]
 
